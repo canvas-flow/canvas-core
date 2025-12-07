@@ -37,6 +37,7 @@ export interface CanvasFlowProps {
   onRunFlow?: (flow: CanvasFlowValue) => void;
   onNodeRun?: (nodeId: string) => Promise<any>;
   onGroupRun?: (groupId: string) => Promise<any>;
+  onGroupSave?: (groupId: string, flow: CanvasFlowValue) => void;
   onSelectionChange?: (nodeIds: string[]) => void;
   onInspectorRequest?: (action: string, payload?: any) => Promise<InspectorOption[]>;
   
@@ -80,6 +81,7 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
     onRunFlow,
     onNodeRun,
     onGroupRun,
+    onGroupSave,
     onSelectionChange,
     onInspectorRequest,
     
@@ -259,8 +261,26 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
       case 'run':
         handleGroupRun(payload.id);
         break;
+      case 'save':
+        const targetGroup = currentFlow.groups?.find(g => g.id === payload.id);
+        if (!targetGroup) {
+            console.warn(`Group ${payload.id} not found for save`);
+            return;
+        }
+        const children = currentFlow.nodes.filter(n => n.groupId === payload.id || n.data?._groupId === payload.id);
+        const childIds = new Set(children.map(n => n.id));
+        const internalEdges = currentFlow.edges.filter(e => childIds.has(e.source) && childIds.has(e.target));
+        
+        const groupFlow: CanvasFlowValue = {
+            nodes: children,
+            edges: internalEdges,
+            groups: [targetGroup],
+            meta: currentFlow.meta
+        };
+        onGroupSave?.(payload.id, groupFlow);
+        break;
     }
-  }, [onGroupAdd, onGroupDelete, onGroupUpdate, currentFlow, onGroupRun]); // Added onGroupRun to deps
+  }, [onGroupAdd, onGroupDelete, onGroupUpdate, currentFlow, onGroupRun, onGroupSave]); // Added onGroupRun to deps
 
   return (
     <CanvasProvider 

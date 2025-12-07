@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+### 这是一个NPM包项目 
+ - 不要执行任何build 和 npm i 操作

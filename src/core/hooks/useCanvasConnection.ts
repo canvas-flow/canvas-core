@@ -176,11 +176,21 @@ export function useCanvasConnection({
              effectiveModel = modelField.defaultValue;
          }
          
-         if (!effectiveModel && modelField.options && modelField.options.length > 0) {
+         // 3. Validate effectiveModel against options
+         // If the determined model is NOT in the options list, fallback to the first available option.
+         // This handles cases where defaultValue (e.g. "gpt-4") is not present in options (e.g. ["gpt-4.1", ...])
+         if (modelField.options && modelField.options.length > 0) {
+             const optionExists = modelField.options.some(opt => String(opt.value) === String(effectiveModel));
+             if (!optionExists) {
+                 effectiveModel = modelField.options[0].value;
+             }
+         } else if (!effectiveModel && modelField.options && modelField.options.length > 0) {
+             // This branch might be redundant due to the above check, but keeping for safety 
+             // if effectiveModel was null/undefined and options existed.
              effectiveModel = modelField.options[0].value;
          }
 
-         // 2. If we resolved a model, ensure it's in the data and sync action
+         // 4. If we resolved a model, ensure it's in the data and sync action
          if (effectiveModel) {
              nodeData.params.model = effectiveModel;
              

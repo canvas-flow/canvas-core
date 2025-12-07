@@ -24,7 +24,7 @@ export const CanvasEmptyState: React.FC<CanvasEmptyStateProps> = ({ onAction }) 
         <span className="cf-instruction-text">画布自由生成,或查看工作流模板</span>
       </div>
       
-      <div className="cf-empty-actions">
+      {/* <div className="cf-empty-actions">
         <button className="cf-action-card" onClick={() => onAction?.('text-to-video')}>
           <Video size={18} />
           <span>文字生视频</span>
@@ -49,7 +49,7 @@ export const CanvasEmptyState: React.FC<CanvasEmptyStateProps> = ({ onAction }) 
           <Workflow size={18} />
           <span>工作流</span>
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { NodeInspectorProps } from '../../types/nodes';
-import type { InspectorItem } from '../../types/inspector';
+import type { InspectorItem, InspectorOption } from '../../types/inspector';
 import { InspectorToolbar } from './InspectorToolbar';
 import { InspectorSettings } from './InspectorSettings';
 import { DropdownPortal } from './DropdownPortal';
@@ -95,6 +95,36 @@ export const NodeInspectorPanel: React.FC<NodeInspectorPanelProps> = ({
       return () => window.removeEventListener('canvas-overlay-active', handleOverlayActive);
     }
   }, [activeDropdown, instanceId]);
+
+  // 4. Auto-correct invalid model value (e.g. when config changes or defaults are invalid)
+  // This ensures that if the current params.model is not in the available options,
+  // we automatically select the first valid option and sync its action.
+  useEffect(() => {
+    if (!config?.functional) return;
+
+    const modelFieldConfig = config.functional.find(f => f.field === 'params.model');
+    if (!modelFieldConfig || !modelFieldConfig.options || modelFieldConfig.options.length === 0) return;
+
+    const currentModel = getNestedValue(node?.data, 'params.model');
+    
+    // Check if current model exists in options (loose comparison for number/string)
+    const isModelValid = modelFieldConfig.options.some(opt => String(opt.value) === String(currentModel));
+
+    if (!isModelValid) {
+      // Fallback to first option
+      const validOption = modelFieldConfig.options[0];
+      // console.log('[Inspector] Auto-correcting invalid model:', currentModel, 'to', validOption.value);
+      
+      let update = buildNestedUpdate(node?.data, 'params.model', validOption.value);
+      
+      // Sync action if available
+      if (validOption.action) {
+        update = buildNestedUpdate(update, 'params.action', validOption.action);
+      }
+      
+      onChange(update);
+    }
+  }, [config, node?.data, onChange]);
 
   // 渲染上游引用
   const renderUpstreamReferences = () => {

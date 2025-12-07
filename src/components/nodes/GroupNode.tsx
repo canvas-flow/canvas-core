@@ -1,6 +1,6 @@
 import React, { memo, useState, useCallback, useMemo } from 'react';
 import { NodeProps, NodeResizer, useReactFlow } from '@xyflow/react';
-import { Play, Ungroup } from 'lucide-react';
+import { Play, Ungroup, Save } from 'lucide-react';
 import { useCanvasContext } from '../../core/CanvasContext';
 import { ActionToolbar, ToolbarAction } from './ActionToolbar';
 
@@ -51,6 +51,17 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps) => {
         icon: Play,
         onClick: handleRun,
         className: 'text-green'
+    },
+    {
+        id: 'save',
+        label: '保存',
+        icon: Save,
+        onClick: (e) => {
+            e.stopPropagation();
+            if (onGroupAction) {
+                onGroupAction('save', { id });
+            }
+        }
     },
     {
         id: 'ungroup',

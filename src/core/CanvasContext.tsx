@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react';
 import { CanvasConfig, ComponentRegistry } from '../types/schema';
 import { InspectorOption } from '../types/inspector';
 
-export type GroupActionType = 'create' | 'delete' | 'update' | 'move' | 'ungroup' | 'run';
+export type GroupActionType = 'create' | 'delete' | 'update' | 'move' | 'ungroup' | 'run' | 'save';
 
 interface CanvasContextValue {
   config: CanvasConfig;
