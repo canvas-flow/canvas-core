@@ -8,8 +8,6 @@ import '../../styles/canvas.css';
 
 // Image Node
 export const ImageNode: React.FC<NodeContentProps> = ({ data, isConnected, onChange }) => {
-  // DEBUG
-  console.log('[ImageNode] Render:', { data, isConnected });
   
   const imgRef = useRef<HTMLImageElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);

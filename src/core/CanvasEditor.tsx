@@ -327,35 +327,39 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         zIndex: -1,
         data: { label: newGroup.label, _isGroup: true },
         style: { width: newGroup.width, height: newGroup.height, zIndex: -1 },
-        selected: true
+        selected: true,
+        draggable: true // Ensure group is draggable
     };
 
     setNodes(nds => {
       // Remove merged group nodes
       let remainingNodes = nds.filter(n => n.type !== 'group' || !involvedGroupIds.has(n.id));
       
-      // Update members
+      // Update members - 保留节点的所有数据
       const updatedNodes = remainingNodes.map(n => {
         if (newGroupNodesMap.has(n.id)) {
-          if (onNodeDataChange) {
-             onNodeDataChange(n.id, { ...n.data, _groupId: groupId });
-          }
-          
           // Get absolute position from snapshot
           const absN = absNodeMap.get(n.id);
           const absX = absN?.position.x ?? n.position.x;
           const absY = absN?.position.y ?? n.position.y;
 
+          // 通知后端更新节点数据（保留所有现有数据）
+          if (onNodeDataChange) {
+             onNodeDataChange(n.id, { ...n.data, _groupId: groupId });
+          }
+
           return {
-            ...n,
-            parentId: groupId, // NEW: Parent/Child linkage
-            expandParent: false, // Prevent child drag from resizing group
+            ...n, // 保留节点的所有属性（包括 width, height, measured 等）
+            parentId: groupId,
+            extent: 'parent' as const,
+            expandParent: true,
+            draggable: true,
             position: {
                 x: absX - newGroup.position.x,
                 y: absY - newGroup.position.y
             },
             selected: false,
-            data: { ...n.data, _groupId: groupId }
+            data: { ...n.data, _groupId: groupId } // 保留节点的所有数据字段
           };
         }
         return n;
@@ -384,20 +388,23 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         const filtered = nds.filter(n => n.id !== targetId);
         return filtered.map(n => {
             if (n.data?._groupId === targetId || n.parentId === targetId) {
-                if (onNodeDataChange) {
-                    onNodeDataChange(n.id, { ...n.data, _groupId: undefined });
-                }
-                
                 // Restore absolute position
                 const absN = absNodeMap.get(n.id);
                 const absX = absN?.position.x ?? n.position.x;
                 const absY = absN?.position.y ?? n.position.y;
 
+                // 通知后端更新节点数据（移除 _groupId，保留其他所有数据）
+                if (onNodeDataChange) {
+                    const updatedData = { ...n.data };
+                    delete updatedData._groupId;
+                    onNodeDataChange(n.id, updatedData);
+                }
+
                 return { 
-                    ...n, 
+                    ...n, // 保留节点的所有属性（包括 width, height, measured, data 等）
                     parentId: undefined,
                     position: { x: absX, y: absY },
-                    data: { ...n.data, _groupId: undefined } 
+                    data: { ...n.data, _groupId: undefined }  // 移除 _groupId，保留其他所有数据
                 };
             }
             return n;
@@ -471,7 +478,36 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         if (onEdgeDelete) onEdgeDelete(targetId);
     } else {
         if (isGroup) {
-            handleUngroup();
+            // 删除分组：删除分组节点和其内部的所有节点
+            setNodes(nds => nds.filter(n => {
+                // 删除分组本身
+                if (n.id === targetId) return false;
+                // 删除分组内的子节点
+                if (n.data?._groupId === targetId || n.parentId === targetId) return false;
+                return true;
+            }));
+            
+            // 同时删除相关连线
+            setEdges(eds => eds.filter(e => {
+                const sourceInGroup = nodes.find(n => 
+                    n.id === e.source && (n.id === targetId || n.data?._groupId === targetId || n.parentId === targetId)
+                );
+                const targetInGroup = nodes.find(n => 
+                    n.id === e.target && (n.id === targetId || n.data?._groupId === targetId || n.parentId === targetId)
+                );
+                return !sourceInGroup && !targetInGroup;
+            }));
+            
+            // 通知上层删除分组
+            if (onGroupDelete) onGroupDelete(targetId);
+            
+            // 通知上层删除组内节点
+            const deletedNodeIds = nodes
+                .filter(n => n.data?._groupId === targetId || n.parentId === targetId)
+                .map(n => n.id);
+            deletedNodeIds.forEach(nodeId => {
+                if (onNodeDelete) onNodeDelete(nodeId);
+            });
         } else {
             setNodes(nds => nds.filter(n => n.id !== targetId));
             setEdges(eds => eds.filter(e => e.source !== targetId && e.target !== targetId));
@@ -479,7 +515,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         }
     }
     setContextMenu(null);
-  }, [contextMenu, nodes, edges, setNodes, setEdges, onNodeDelete, onEdgeDelete, handleUngroup]);
+  }, [contextMenu, nodes, edges, setNodes, setEdges, onNodeDelete, onEdgeDelete, onGroupDelete]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -544,7 +580,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
     if (contextMenu?.type === 'group') {
         items.push({
             label: '解散分组 (Ungroup)',
-            onClick: handleUngroup,
+            onClick: () => handleUngroup(contextMenu.targetId),
             icon: <Group size={16} />,
         });
     }

@@ -36,8 +36,10 @@ export const toReactFlowNodes = (nodes: CanvasFlowNode[], groups: CanvasFlowGrou
       id: node.id,
       type: node.type,
       position: position,
-      parentId: parentId, // Set parent ID
-      expandParent: false, // Disable auto-expand to prevent layout shifts
+      parentId: parentId, // Set parent ID for React Flow parent-child relationship
+      extent: parentId ? ('parent' as const) : undefined, // Keep children within parent bounds
+      expandParent: true, // Allow group to resize when dragging children
+      draggable: true, // Ensure nodes are draggable
       zIndex: 10,
       width: node.width,
       height: node.height,
@@ -60,6 +62,7 @@ export const toReactFlowNodes = (nodes: CanvasFlowNode[], groups: CanvasFlowGrou
     type: 'group',
     position: group.position,
     zIndex: -1,
+    draggable: true, // Ensure groups can be dragged
     width: group.width,
     height: group.height,
     data: {
