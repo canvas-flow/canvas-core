@@ -151,58 +151,8 @@ export function useCanvasConnection({
     flowPos.x -= 100; 
     flowPos.y -= 50;
 
-    // 获取节点类型配置并使用 defaultData
+    // 获取节点类型配置
     const definition = config.nodeDefinitions.find(def => def.type === type);
-    let nodeData: any = { _kind: type };
-    if (definition?.defaultData) {
-      nodeData = { ...nodeData, ...definition.defaultData };
-    }
-    
-    // Ensure params object exists
-    if (!nodeData.params) {
-      nodeData.params = {};
-    }
-
-    // 修正初始数据：根据默认 model 同步 action
-    if (definition?.inspector?.functional) {
-      const modelField = definition.inspector.functional.find(f => f.field === 'params.model');
-      
-      if (modelField) {
-         // 1. Determine Effective Model Value
-         // Priority: defaultData > defaultValue > first option
-         let effectiveModel = nodeData.params.model;
-         
-         if (!effectiveModel) {
-             effectiveModel = modelField.defaultValue;
-         }
-         
-         // 3. Validate effectiveModel against options
-         // If the determined model is NOT in the options list, fallback to the first available option.
-         // This handles cases where defaultValue (e.g. "gpt-4") is not present in options (e.g. ["gpt-4.1", ...])
-         if (modelField.options && modelField.options.length > 0) {
-             const optionExists = modelField.options.some(opt => String(opt.value) === String(effectiveModel));
-             if (!optionExists) {
-                 effectiveModel = modelField.options[0].value;
-             }
-         } else if (!effectiveModel && modelField.options && modelField.options.length > 0) {
-             // This branch might be redundant due to the above check, but keeping for safety 
-             // if effectiveModel was null/undefined and options existed.
-             effectiveModel = modelField.options[0].value;
-         }
-
-         // 4. If we resolved a model, ensure it's in the data and sync action
-         if (effectiveModel) {
-             nodeData.params.model = effectiveModel;
-             
-             if (modelField.options) {
-                 const selectedOption = modelField.options.find(opt => String(opt.value) === String(effectiveModel));
-                 if (selectedOption && selectedOption.action) {
-                     nodeData.params.action = selectedOption.action;
-                 }
-             }
-         }
-      }
-    }
 
     const defaultWidth = definition?.width || 250;
     const defaultHeight = definition?.height || 250;
@@ -218,13 +168,13 @@ export function useCanvasConnection({
             width: `${defaultWidth}px`, 
             height: `${defaultHeight}px` 
         },
-        data: nodeData
+        data: {}, // Empty data object for ReactFlow
     };
 
     setNodes((nds) => nds.concat(newNode));
     
     if (onNodeAdd) {
-        const { nodes: newNodes } = fromReactFlowNodes([newNode]);
+        const { nodes: newNodes } = fromReactFlowNodes([newNode], []);
         if (newNodes.length > 0) {
            onNodeAdd(newNodes[0]);
         }

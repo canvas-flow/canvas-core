@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { InspectorConfig } from './inspector';
 
 // 节点内容组件的 Props 标准
 export interface NodeContentProps {
@@ -28,9 +27,6 @@ export interface NodeDefinition {
    * 指向注册表中的 key
    */
   component: string; 
-  
-  /** 属性面板配置 (JSON) */
-  inspector?: InspectorConfig;
   
   /** 初始数据 */
   defaultData?: Record<string, any>;

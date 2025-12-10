@@ -6,12 +6,25 @@ export interface CanvasFlowNode {
   id: string;
   type: CanvasNodeKind;
   position: { x: number; y: number };
-  data: NodeData;
+  data?: NodeData; // 数据字段标记为可选，支持数据分离架构
   /** 所属编组 ID */
   groupId?: string;
   /** 节点宽度 */
   width?: number;
   /** 节点高度 */
+  height?: number;
+}
+
+/**
+ * 纯结构节点（不含业务数据）
+ * 用于数据分离架构，只包含位置、类型等结构信息
+ */
+export interface StructureNode {
+  id: string;
+  type: CanvasNodeKind;
+  position: { x: number; y: number };
+  groupId?: string;
+  width?: number;
   height?: number;
 }
 

@@ -1,41 +1,43 @@
-/** 节点通用数据参数 */
-export interface NodeParams {
-  /** 使用的模型 */
-  model?: string;
-  /** 模型库来源 (如 openai, anthropic 等) */
-  provider?: string;
-  /** 资源比例 (如 16:9, 1:1) */
-  aspectRatio?: string;
-  /** 资源大小 (如 1024x1024) */
-  imageSize?: string;
-  /** 是否启用 Google 搜索 */
-  enableGoogleSearch?: boolean;
-  /** 分辨率/决定参数 */
-  resolution?: string;
-}
-
-/** 节点数据基础结构 */
+/** 节点数据基础结构（Core 层只管理媒体内容和显示字段）*/
 export interface NodeData {
-  /** 资源地址 */
+  // 媒体内容字段
+  /** 资源地址（图片/视频/音频 URL）*/
   src?: string;
-  /** 模型提示词 */
-  prompt?: string;
-  /** 节点标题 */
-  title?: string;
-  /** 资源类型 (如 image/png, video/mp4) - 避免与 node.type 混淆 */
-  resourceType?: string;
-  /** 模型参数配置 */
-  params?: NodeParams;
-  
-  // 现有字段保持兼容
   /** 文本内容 (TextNode) */
   text?: string;
   /** 输出结果 */
   output?: string;
+  /** 输出数据（结构化）*/
+  outputData?: any;
+  /** 文件名 */
+  fileName?: string;
+  /** 文件类型（MIME）*/
+  fileType?: string;
+  /** 资源类型 (如 image/png, video/mp4) - 避免与 node.type 混淆 */
+  resourceType?: string;
+  
+  // 显示字段（用于 UI 展示）
+  /** 节点标题 */
+  title?: string;
+  
+  // UI 状态字段（以 _ 开头，Core 内部使用）
+  /** 加载状态 */
+  _loading?: boolean;
+  /** 错误信息 */
+  _error?: string;
+  /** 执行状态 */
+  _executionStatus?: string;
+  /** 内容尺寸 */
+  _contentSize?: { width: number; height: number };
+  /** 节点类型标识（已废弃，使用 node.type）*/
+  _kind?: string;
+  
+  // 其他遗留字段
   /** 是否已交互 */
   isInteracted?: boolean;
   
   // 允许扩展其他字段
   [key: string]: any;
 }
+
 

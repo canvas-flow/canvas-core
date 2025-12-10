@@ -1,8 +1,7 @@
-import { memo, useCallback, useRef, useEffect, useMemo } from 'react';
+import { memo, useCallback, useRef, useEffect, useMemo, useState } from 'react';
 import { Handle, Position, NodeToolbar, NodeProps, useReactFlow, useEdges, useNodesData } from '@xyflow/react';
 import { Loader2 } from 'lucide-react';
 import { useCanvasContext } from './CanvasContext';
-import { NodeInspectorPanel } from '../components/inspector/NodeInspectorPanel';
 import { NodeContentProps } from '../types/schema';
 import type { CanvasUpstreamNode } from '../types/flow';
 
@@ -34,22 +33,38 @@ export const UniversalNode = memo((props: NodeProps) => {
     config, 
     components, 
     readOnly, 
-    onInspectorRequest, 
     onNodeRun, 
     runningNodeId, 
     isExecuting, 
     onNodeDataChange,
-    inspectingNodeId 
+    inspectingNodeId,
+    mediaMap,
+    mediaEmitter,
+    updateNodeMedia,
+    renderNodeInspector
   } = useCanvasContext();
   const { setNodes, getNode } = useReactFlow();
   const edges = useEdges();
-
-  // Log style prop to debug
-  useEffect(() => {
-    if (style && (style.width || style.height)) {
-       console.log(`[UniversalNode] Rendered with style:`, style, 'id:', id);
+  
+  // 订阅媒体数据更新
+  // 初始化时从 mediaMap 获取，如果没有则使用 props.data
+  const [nodeMedia, setNodeMedia] = useState(() => {
+    const mediaFromMap = mediaMap.get(id);
+    if (mediaFromMap && Object.keys(mediaFromMap).length > 0) {
+      return mediaFromMap;
     }
-  }, [style, id]);
+    // 降级：使用 props.data（向后兼容）
+    return data || {};
+  });
+  
+  useEffect(() => {
+    const handler = (updatedMedia: any) => {
+      setNodeMedia(updatedMedia);
+    };
+    mediaEmitter.on(id, handler);
+    return () => mediaEmitter.off(id, handler);
+  }, [id, mediaEmitter]);
+
 
   // 1. 查找节点定义
   const nodeType = props.type || 'default';
@@ -65,9 +80,6 @@ export const UniversalNode = memo((props: NodeProps) => {
 
   // 2. 查找内容渲染组件
   const ContentComponent = components[definition.component];
-  
-  // 3. Inspector 配置
-  const inspectorConfig = definition.inspector;
 
   // Debounce the external sync to prevent API flooding
   const debouncedSync = useDebouncedCallback((nodeId: string, newData: any) => {
@@ -77,20 +89,11 @@ export const UniversalNode = memo((props: NodeProps) => {
   }, 500);
 
   const handleNodeChange = (newData: any) => {
-    // CRITICAL FIX: Merge current data with new data to ensure full data object is sent
-    // Backend might overwrite the entire data object, so we must send everything.
-    const fullData = { ...data, ...newData };
-
-    // 1. Optimistic UI Update (Immediate)
-    setNodes((nodes) => nodes.map((n) => {
-      if (n.id === id) {
-        return { ...n, data: fullData };
-      }
-      return n;
-    }));
+    // 1. Update local nodeMedia state immediately (UI responds instantly)
+    setNodeMedia(prev => ({ ...prev, ...newData }));
     
-    // 2. Debounced Backend Sync (Send Full Data)
-    debouncedSync(id, fullData);
+    // 2. Notify external (debounced sync to backend)
+    debouncedSync(id, newData);
   };
 
   const isConnected = edges.some(e => e.source === id || e.target === id);
@@ -125,7 +128,7 @@ export const UniversalNode = memo((props: NodeProps) => {
 
   const contentProps: NodeContentProps = {
     nodeId: id,
-    data: data,
+    data: { ...data, ...nodeMedia }, // 合并结构数据和媒体数据
     selected: !!selected,
     isConnected,
     onChange: handleNodeChange,
@@ -135,20 +138,20 @@ export const UniversalNode = memo((props: NodeProps) => {
 
   return (
     <div className={`canvas-node ${selected ? 'selected' : ''}`} style={{width: '100%', height: '100%'}}>
-      {/* Node Toolbar / Inspector */}
-      <NodeToolbar isVisible={id === inspectingNodeId && !readOnly} position={Position.Bottom}>
-        <NodeInspectorPanel 
-          node={{ id, type: nodeType, data, position: { x: 0, y: 0 } }} 
-          onChange={handleNodeChange}
-          config={inspectorConfig}
-          onRequestOptions={onInspectorRequest}
-          onRunNode={onNodeRun ? () => onNodeRun(id) : undefined}
-          isRunning={runningNodeId === id}
-          disabled={!!isExecuting}
-          showInput={inspectorConfig?.showInput ?? true}
-        upstreamNodes={upstreamNodes}
-        />
-      </NodeToolbar>
+      {/* Node Toolbar / Inspector (Render Props pattern) */}
+      {renderNodeInspector && (
+        <NodeToolbar isVisible={id === inspectingNodeId && !readOnly} position={Position.Bottom}>
+          {renderNodeInspector({
+            nodeId: id,
+            node: {
+              id,
+              type: nodeType,
+              position: { x: 0, y: 0 },
+              data: nodeMedia,
+            }
+          })}
+        </NodeToolbar>
+      )}
 
       {/* Label */}
       <div className="canvas-node-label">
@@ -170,7 +173,7 @@ export const UniversalNode = memo((props: NodeProps) => {
         {/* Safety check: If node has content (src/output), don't show loading even if status says running. 
             This prevents UI from getting stuck in loading state if status update fails or is delayed,
             but we have the result. */}
-        {data._executionStatus === 'running' && !data.src && !data.output && (
+        {(nodeMedia._loading || nodeMedia._executionStatus === 'running') && !nodeMedia.src && !nodeMedia.output && (
             <div className="cf-upload-loading-overlay" style={{
                 position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
                 background: 'rgba(0,0,0,0.7)',
@@ -180,6 +183,19 @@ export const UniversalNode = memo((props: NodeProps) => {
                 <Loader2 className="cf-spinner" size={24} style={{ animation: 'spin 1s linear infinite' }} />
                 <span style={{fontSize: 12}}>Running...</span>
                 <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+            </div>
+        )}
+
+        {/* GLOBAL ERROR OVERLAY */}
+        {nodeMedia._error && (
+            <div className="cf-node-error-overlay" style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                background: 'rgba(220, 38, 38, 0.9)',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                zIndex: 20, color: '#fff', gap: 8, borderRadius: 'inherit', padding: 12
+            }}>
+                <span style={{fontSize: 14, fontWeight: 600}}>⚠️ Error</span>
+                <span style={{fontSize: 12, textAlign: 'center', wordBreak: 'break-word'}}>{nodeMedia._error}</span>
             </div>
         )}
       </div>

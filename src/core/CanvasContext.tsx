@@ -1,6 +1,7 @@
 import React, { createContext, useContext } from 'react';
 import { CanvasConfig, ComponentRegistry } from '../types/schema';
-import { InspectorOption } from '../types/inspector';
+import { CanvasFlowNode } from '../types/flow';
+import { NodeMediaEmitter } from './NodeMediaEmitter';
 
 export type GroupActionType = 'create' | 'delete' | 'update' | 'move' | 'ungroup' | 'run' | 'save';
 
@@ -8,7 +9,6 @@ interface CanvasContextValue {
   config: CanvasConfig;
   components: ComponentRegistry;
   readOnly: boolean;
-  onInspectorRequest?: (action: string, payload?: any) => Promise<InspectorOption[]>;
   onNodeRun?: (nodeId: string) => Promise<void>;
   onNodeDataChange?: (nodeId: string, data: any) => void;
   runningNodeId?: string | null;
@@ -21,6 +21,16 @@ interface CanvasContextValue {
   // Global overlay state for mutex
   activeOverlay?: { nodeId: string; elementId: string } | null;
   setActiveOverlay?: (overlay: { nodeId: string; elementId: string } | null) => void;
+  // 媒体数据管理
+  mediaMap: Map<string, any>;
+  mediaEmitter: NodeMediaEmitter;
+  getNodeMedia: (nodeId: string) => any;
+  updateNodeMedia: (nodeId: string, media: any) => void;
+  // Custom Inspector rendering (Render Props)
+  renderNodeInspector?: (props: {
+    nodeId: string;
+    node: CanvasFlowNode;
+  }) => React.ReactNode;
 }
 
 const CanvasContext = createContext<CanvasContextValue | null>(null);
