@@ -59,12 +59,12 @@ flowRef.current.setNodeAudio(nodeId, 'https://example.com/audio.mp3');
 flowRef.current.setNodeText(nodeId, 'Hello World');
 ```
 
-### 输出数据
+### ~~输出数据~~ （已弃用）
 ```typescript
 flowRef.current.setNodeOutput(nodeId, { result: 'success', data: {...} });
 ```
 
-### 通用内容
+### ~~通用内容~~（内部实现）
 ```typescript
 flowRef.current.setNodeContent(nodeId, {
   src: 'url',

@@ -677,6 +677,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         nodeTypes={reactFlowNodeTypes}
         onSelectionChange={onSelectionChangeInternal}
         fitView
+        minZoom={0.2}
         nodesDraggable={!readOnly}
         nodesConnectable={!readOnly}
         deleteKeyCode={['Delete']}
