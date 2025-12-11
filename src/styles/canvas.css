@@ -631,6 +631,25 @@ video::-webkit-media-controls-enclosure {
   to { transform: rotate(360deg); }
 }
 
+/* Upload Error Overlay */
+.cf-upload-error-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(220, 38, 38, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  color: #fff;
+  font-size: 12px;
+  padding: 12px;
+  text-align: center;
+  border-radius: inherit;
+}
+
 
 /* --- Media Viewer Modal --- */
 .cf-media-modal-overlay {

@@ -9,18 +9,42 @@ interface SelectionMenuProps {
 }
 
 export const SelectionMenu: React.FC<SelectionMenuProps> = ({ selectedNodes, onCreateGroup }) => {
-  const { flowToScreenPosition } = useReactFlow();
+  const { flowToScreenPosition, getNodes } = useReactFlow();
 
   // 过滤掉已经是 group 的节点
   const validNodes = selectedNodes.filter(n => n.type !== 'group');
 
   if (validNodes.length < 2) return null;
 
-  const bounds = getBounds(validNodes.map(n => ({
-    position: n.position,
-    width: n.measured?.width || n.width || 0,
-    height: n.measured?.height || n.height || 0
-  })));
+  // ✅ 限制：如果选中的节点中有任何一个已经在编组内，不显示编组按钮
+  const hasNodeInGroup = validNodes.some(n => n.parentId);
+  if (hasNodeInGroup) return null;
+
+  // 获取所有节点用于查找父编组
+  const allNodes = getNodes();
+  const nodeMap = new Map(allNodes.map(n => [n.id, n]));
+
+  // 计算每个节点的绝对坐标
+  const bounds = getBounds(validNodes.map(n => {
+    let absolutePosition = n.position;
+    
+    // 如果节点在编组内，需要加上父编组的位置得到绝对坐标
+    if (n.parentId) {
+      const parentNode = nodeMap.get(n.parentId as string);
+      if (parentNode) {
+        absolutePosition = {
+          x: n.position.x + parentNode.position.x,
+          y: n.position.y + parentNode.position.y
+        };
+      }
+    }
+    
+    return {
+      position: absolutePosition,
+      width: n.measured?.width || n.width || 0,
+      height: n.measured?.height || n.height || 0
+    };
+  }));
 
   // 计算中心上方位置 (Flow 坐标)
   const centerFlow = {

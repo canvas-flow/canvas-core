@@ -13,6 +13,13 @@ export interface CanvasFlowNode {
   width?: number;
   /** 节点高度 */
   height?: number;
+  /** 
+   * 坐标类型标记（内部字段，用于坐标转换）
+   * - 'absolute': 绝对坐标（相对于画布原点）
+   * - 'relative': 相对坐标（相对于父编组）
+   * - undefined: 未标记（自动推断：有 groupId 则相对，否则绝对）
+   */
+  _coordinateType?: 'absolute' | 'relative';
 }
 
 /**
@@ -26,6 +33,8 @@ export interface StructureNode {
   groupId?: string;
   width?: number;
   height?: number;
+  /** 坐标类型标记 */
+  _coordinateType?: 'absolute' | 'relative';
 }
 
 export interface CanvasFlowEdge {

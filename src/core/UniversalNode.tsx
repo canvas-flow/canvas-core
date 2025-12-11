@@ -170,10 +170,9 @@ export const UniversalNode = memo((props: NodeProps) => {
         )}
 
         {/* GLOBAL LOADING OVERLAY */}
-        {/* Safety check: If node has content (src/output), don't show loading even if status says running. 
-            This prevents UI from getting stuck in loading state if status update fails or is delayed,
-            but we have the result. */}
-        {(nodeMedia._loading || nodeMedia._executionStatus === 'running') && !nodeMedia.src && !nodeMedia.output && (
+        {/* ✅ 修改：移除 src/output 检查，即使节点已有输出也显示 loading
+            这样重新执行已有结果的节点时，用户可以看到 loading 状态 */}
+        {(nodeMedia._loading || nodeMedia._executionStatus === 'running') && (
             <div className="cf-upload-loading-overlay" style={{
                 position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
                 background: 'rgba(0,0,0,0.7)',

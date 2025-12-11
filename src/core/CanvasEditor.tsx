@@ -101,6 +101,9 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
   // Store group metadata (label, style) separately
   const groupsRef = useRef<CanvasFlowGroup[]>([]);
   
+  // Flag to prevent onChange callback when setFlow is called programmatically
+  const isInternalUpdateRef = useRef(false);
+  
   // Init Data
   useEffect(() => {
     if (initialFlow) {
@@ -117,6 +120,12 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
   }, [onChange]);
 
   useEffect(() => {
+    // Skip onChange callback if this is an internal update from setFlow
+    if (isInternalUpdateRef.current) {
+      isInternalUpdateRef.current = false;
+      return;
+    }
+    
     if (onChangeRef.current) {
       const { nodes: canvasNodes, groups: canvasGroups } = fromReactFlowNodes(nodes, groupsRef.current);
       const flowValue: CanvasFlowValue = {
@@ -626,6 +635,8 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
     fitView: () => rfInstance?.fitView(),
     getViewport: () => rfInstance?.getViewport(),
     setFlow: (flow: CanvasFlowValue) => {
+      // Mark as internal update to skip onChange callback
+      isInternalUpdateRef.current = true;
       setNodes(toReactFlowNodes(flow.nodes, flow.groups));
       setEdges(toReactFlowEdges(flow.edges));
       groupsRef.current = flow.groups || [];

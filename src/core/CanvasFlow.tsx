@@ -90,6 +90,12 @@ export interface CanvasFlowHandle {
   setNodeText(nodeId: string, text: string): void;
   setNodeOutput(nodeId: string, outputData: any): void;
   
+  // 上传节点专用 API
+  setUploadNodeSrc(nodeId: string, src: string, fileInfo?: { fileName?: string; fileType?: string; fileSize?: number }): void;
+  setUploadNodeLoading(nodeId: string, loading: boolean): void;
+  setUploadNodeError(nodeId: string, error: string | null): void;
+  clearUploadNode(nodeId: string): void;
+  
   // 通用内容设置 API (保留，用于特殊场景)
   setNodeContent(nodeId: string, content: { src?: string; text?: string; outputData?: any }): void;
   clearNodeContent(nodeId: string): void;
@@ -226,6 +232,8 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
       'fileName',      // 文件名
       'fileType',      // 文件类型
       'fileSize',      // 文件大小
+      '_uploading',    // 上传中状态
+      '_uploadError',  // 上传错误信息
       
       // 其他媒体相关字段
       'resourceType',  // 资源类型
@@ -382,6 +390,93 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
         console.warn(`[setNodeOutput] 节点不存在: ${nodeId}`);
       }
     },
+    
+    // ========== 上传节点专用 API ==========
+    
+    /**
+     * 设置上传节点的媒体源（图片或视频）
+     * @param nodeId - 节点 ID
+     * @param src - 媒体 URL
+     * @param fileInfo - 文件信息（可选）
+     */
+    setUploadNodeSrc: (nodeId: string, src: string, fileInfo?: { fileName?: string; fileType?: string; fileSize?: number }) => {
+      if (!validateNodeType(nodeId, 'user-upload', 'setUploadNodeSrc')) {
+        return;
+      }
+      
+      const updates: any = { 
+        src,
+        _uploading: false,  // 设置成功后清除上传状态
+        _uploadError: null, // 清除错误
+      };
+      
+      // 合并文件信息
+      if (fileInfo) {
+        if (fileInfo.fileName) updates.fileName = fileInfo.fileName;
+        if (fileInfo.fileType) updates.fileType = fileInfo.fileType;
+        if (fileInfo.fileSize) updates.fileSize = fileInfo.fileSize;
+      }
+      
+      updateMediaData(nodeId, updates);
+      console.log(`[setUploadNodeSrc] 设置上传节点 ${nodeId} 的媒体源:`, src);
+    },
+    
+    /**
+     * 设置上传节点的加载状态
+     * @param nodeId - 节点 ID
+     * @param loading - 是否加载中
+     */
+    setUploadNodeLoading: (nodeId: string, loading: boolean) => {
+      if (!validateNodeType(nodeId, 'user-upload', 'setUploadNodeLoading')) {
+        return;
+      }
+      
+      updateMediaData(nodeId, { 
+        _uploading: loading,
+        _uploadError: loading ? null : undefined, // 开始加载时清除错误
+      });
+      console.log(`[setUploadNodeLoading] 设置上传节点 ${nodeId} 加载状态:`, loading);
+    },
+    
+    /**
+     * 设置上传节点的错误状态
+     * @param nodeId - 节点 ID
+     * @param error - 错误信息（null 表示清除错误）
+     */
+    setUploadNodeError: (nodeId: string, error: string | null) => {
+      if (!validateNodeType(nodeId, 'user-upload', 'setUploadNodeError')) {
+        return;
+      }
+      
+      updateMediaData(nodeId, { 
+        _uploadError: error,
+        _uploading: false, // 出错时清除加载状态
+      });
+      console.log(`[setUploadNodeError] 设置上传节点 ${nodeId} 错误:`, error);
+    },
+    
+    /**
+     * 清空上传节点的所有内容和状态
+     * @param nodeId - 节点 ID
+     */
+    clearUploadNode: (nodeId: string) => {
+      if (!validateNodeType(nodeId, 'user-upload', 'clearUploadNode')) {
+        return;
+      }
+      
+      updateMediaData(nodeId, { 
+        src: undefined,
+        fileName: undefined,
+        fileType: undefined,
+        fileSize: undefined,
+        output: undefined,
+        _uploading: undefined,
+        _uploadError: undefined,
+      });
+      console.log(`[clearUploadNode] 清空上传节点 ${nodeId}`);
+    },
+    
+    // ========== 通用内容设置 API ==========
     
     // 通用内容设置 API (直接调用内部核心方法)
     setNodeContent: (nodeId: string, content: any) => {
