@@ -8,7 +8,8 @@ import '../../styles/canvas.css';
 export const TextNode: React.FC<NodeContentProps> = ({ data, isConnected, onChange }) => {
   const [isEditing, setIsEditing] = useState(false);
   
-  const showEditor = isConnected || data.isInteracted;
+  // ✅ 显示编辑器的条件：有连接关系 OR 已交互过 OR 已有文本内容
+  const showEditor = isConnected || data.isInteracted || !!data.text;
 
   const menuItems: MenuAction[] = [
     { id: 'edit', icon: PenLine, label: '自己编写内容' },

@@ -679,7 +679,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         fitView
         nodesDraggable={!readOnly}
         nodesConnectable={!readOnly}
-        deleteKeyCode={['Backspace', 'Delete']}
+        deleteKeyCode={['Delete']}
         selectionKeyCode={['Shift']} 
       >
         <Background />
