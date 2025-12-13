@@ -9,6 +9,7 @@ export * from './types/schema'; // New schema types
 
 export * from './components/FloatingNodeMenu';
 export * from './components/CanvasEmptyState';
+export * from './components/NodeTitleEditor';
 export * from './components/nodes';
 
 // Export default config and components for easier usage

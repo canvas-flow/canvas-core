@@ -64,6 +64,54 @@
   pointer-events: none;
 }
 
+/* --- Node Title Editor --- */
+.canvas-node-title {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  color: #888;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: text;
+  transition: color 0.2s;
+  pointer-events: auto;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.canvas-node-title:hover {
+  color: #ccc;
+}
+
+.canvas-node-title.editing {
+  color: #fff;
+}
+
+.canvas-node-title-input {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  min-width: 50px;
+  max-width: 200px;
+  transition: border-color 0.2s;
+  pointer-events: auto;
+}
+
+.canvas-node-title-input:focus {
+  border-color: #888;
+  box-shadow: 0 0 0 2px rgba(136, 136, 136, 0.2);
+}
+
 .canvas-node-body {
   padding: 0;
   flex: 1;

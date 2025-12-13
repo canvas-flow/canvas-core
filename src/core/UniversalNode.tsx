@@ -3,6 +3,7 @@ import { Handle, Position, NodeToolbar, NodeProps, useReactFlow, useEdges, useNo
 import { Loader2 } from 'lucide-react';
 import { useCanvasContext } from './CanvasContext';
 import { NodeContentProps } from '../types/schema';
+import { NodeTitleEditor } from '../components/NodeTitleEditor';
 import type { CanvasUpstreamNode } from '../types/flow';
 
 function useDebouncedCallback<T extends (...args: any[]) => any>(
@@ -90,9 +91,29 @@ export const UniversalNode = memo((props: NodeProps) => {
 
   const handleNodeChange = (newData: any) => {
     // 1. Update local nodeMedia state immediately (UI responds instantly)
-    setNodeMedia(prev => ({ ...prev, ...newData }));
+    const updatedMedia = { ...nodeMedia, ...newData };
+    setNodeMedia(updatedMedia);
     
-    // 2. Notify external (debounced sync to backend)
+    // 2. Update mediaMap cache (托管缓存)
+    mediaMap.set(id, updatedMedia);
+    mediaEmitter.emit(id, updatedMedia);
+    
+    // 3. Update React Flow node data (让外部应用能监听到变更)
+    // 关键：确保 title 等字段被保存到 React Flow 的 node.data 中
+    setNodes((nodes) =>
+      nodes.map((node) => {
+        if (node.id === id) {
+          // 合并 newData 到 node.data，确保所有字段都被保存
+          const mergedData = { ...node.data, ...newData };
+          console.log('[handleNodeChange] 更新节点数据:', { nodeId: id, newData, mergedData });
+          return { ...node, data: mergedData };
+        }
+        return node;
+      })
+    );
+    
+    // 4. Notify external (debounced sync to backend)
+    // 防抖确保不会频繁调用后端 API
     debouncedSync(id, newData);
   };
 
@@ -153,10 +174,12 @@ export const UniversalNode = memo((props: NodeProps) => {
         </NodeToolbar>
       )}
 
-      {/* Label */}
-      <div className="canvas-node-label">
-        {definition.label}
-      </div>
+      {/* Title Editor */}
+      <NodeTitleEditor
+        title={nodeMedia.title || ''}
+        defaultTitle={definition.label}
+        onChange={handleNodeChange}
+      />
 
       {/* Handles */}
       <Handle type="target" position={Position.Left} className="canvas-handle" />
