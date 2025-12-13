@@ -177,9 +177,11 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
    */
   const findNode = useCallback((nodeId: string): CanvasFlowNode | null => {
     const editorFlow = editorRef.current?.getFlow?.();
-    if (!editorFlow) return null;
-    return editorFlow.nodes.find(n => n.id === nodeId) || null;
-  }, []);
+    const flow = editorFlow || currentFlow;  // ✅ 降级到 currentFlow
+    
+    if (!flow || !flow.nodes) return null;
+    return flow.nodes.find(n => n.id === nodeId) || null;
+  }, [currentFlow]);
   
   /**
    * 验证节点类型（内部方法）
@@ -324,9 +326,10 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
     // 节点查询 API
     getNode: (nodeId: string) => {
       const editorFlow = editorRef.current?.getFlow?.();
-      if (!editorFlow) return null;
+      const flow = editorFlow || currentFlow;  // ✅ 降级到 currentFlow
       
-      return editorFlow.nodes.find(n => n.id === nodeId) || null;
+      if (!flow || !flow.nodes) return null;
+      return flow.nodes.find(n => n.id === nodeId) || null;
     },
     getUpstreamNodes: (nodeId: string) => {
       const editorFlow = editorRef.current?.getFlow?.();
@@ -553,7 +556,7 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
       mediaMapRef.current.set(nodeId, updatedMedia);
       mediaEmitterRef.current.emit(nodeId, updatedMedia);
     }
-  }));
+  }), [currentFlow, config, findNode, validateNodeType, updateMediaData]);
 
   const handleFlowChange = useCallback((newFlow: CanvasFlowValue) => {
     setCurrentFlow(newFlow);

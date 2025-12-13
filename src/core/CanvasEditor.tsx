@@ -39,7 +39,6 @@ interface CanvasEditorProps {
 
   onGroupAdd?: (group: CanvasFlowGroup) => void;
   onGroupDelete?: (groupId: string) => void;
-  onGroupUngroup?: (groupId: string, nodeIds: string[]) => void;
   onGroupUpdate?: (group: Partial<CanvasFlowGroup> & { id: string }) => void;
 }
 
@@ -57,7 +56,6 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
   onEdgeDelete,
   onGroupAdd,
   onGroupDelete,
-  onGroupUngroup,
   onGroupUpdate,
 }, _ref) => {
   const { config, onNodeDataChange } = useCanvasContext();
@@ -98,18 +96,11 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
   const [mousePosition, setMousePosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   
-  // Store group metadata (label, style) separately
-  const groupsRef = useRef<CanvasFlowGroup[]>([]);
-  
-  // Flag to prevent onChange callback when setFlow is called programmatically
-  const isInternalUpdateRef = useRef(false);
-  
   // Init Data
   useEffect(() => {
     if (initialFlow) {
       setNodes(toReactFlowNodes(initialFlow.nodes, initialFlow.groups));
       setEdges(toReactFlowEdges(initialFlow.edges));
-      groupsRef.current = initialFlow.groups || [];
     }
   }, []);
 
@@ -120,14 +111,8 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
   }, [onChange]);
 
   useEffect(() => {
-    // Skip onChange callback if this is an internal update from setFlow
-    if (isInternalUpdateRef.current) {
-      isInternalUpdateRef.current = false;
-      return;
-    }
-    
     if (onChangeRef.current) {
-      const { nodes: canvasNodes, groups: canvasGroups } = fromReactFlowNodes(nodes, groupsRef.current);
+      const { nodes: canvasNodes, groups: canvasGroups } = fromReactFlowNodes(nodes);
       const flowValue: CanvasFlowValue = {
         nodes: canvasNodes,
         edges: fromReactFlowEdges(edges),
@@ -160,23 +145,11 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
     onNodesChange(changes);
     
     changes.forEach(change => {
-      if (change.type === 'remove') {
-        // 检查是否是分组节点
-        const node = nodes.find(n => n.id === change.id);
-        if (node?.type === 'group') {
-          // 分组节点：调用 onGroupDelete
-          if (onGroupDelete) {
-            onGroupDelete(change.id);
-          }
-        } else {
-          // 普通节点：调用 onNodeDelete
-          if (onNodeDelete) {
-            onNodeDelete(change.id);
-          }
-        }
+      if (change.type === 'remove' && onNodeDelete) {
+        onNodeDelete(change.id);
       }
     });
-  }, [onNodesChange, onNodeDelete, onGroupDelete, nodes]);
+  }, [onNodesChange, onNodeDelete]);
 
   const handleEdgesChange = useCallback((changes: EdgeChange[]) => {
     onEdgesChange(changes);
@@ -208,51 +181,25 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
 
   // REMOVED: dragRef, onNodeDragStart, onNodeDrag (Native Dragging)
 
-  const handleNodeDragStop = useCallback((_event: React.MouseEvent, node: Node, allNodes: Node[]) => {
-    // 1. 处理编组节点拖动
+  const handleNodeDragStop = useCallback((_event: React.MouseEvent, node: Node, _nodes: Node[]) => {
     if (node.type === 'group') {
         if (onGroupUpdate) {
-            // ✅ 保存编组的位置和尺寸（measured 是 ReactFlow 测量的实际尺寸）
-            onGroupUpdate({ 
-              id: node.id, 
-              position: node.position,
-              width: node.measured?.width || node.width,
-              height: node.measured?.height || node.height
-            });
+            onGroupUpdate({ id: node.id, position: node.position });
         }
+        // No need to update children positions as they are now stored relatively
         return;
     }
     
-    // 2. 处理普通节点拖动
     if (onNodeMove) {
       // We trust fromReactFlowNodes to handle whether to save relative or absolute
       // based on parentId presence.
-      const { nodes: convertedNodes } = fromReactFlowNodes(allNodes, groupsRef.current); 
+      const { nodes: convertedNodes } = fromReactFlowNodes(nodes); 
       const target = convertedNodes.find(n => n.id === node.id);
       if (target) {
           onNodeMove(target);
       }
     }
-    
-    // 3. ✅ 新增：如果拖动的节点属于编组，同时更新编组尺寸
-    // 因为 expandParent 会自动扩大编组，我们需要保存新的尺寸
-    if (node.parentId && onGroupUpdate) {
-        const groupNode = allNodes.find(n => n.id === node.parentId);
-        if (groupNode && groupNode.measured) {
-            // 只有当编组有 measured 尺寸时才更新（说明尺寸已经变化）
-            onGroupUpdate({
-              id: groupNode.id,
-              position: groupNode.position,
-              width: groupNode.measured.width,
-              height: groupNode.measured.height
-            });
-            console.log(`[编组自动扩展] 保存编组 ${groupNode.id} 的新尺寸:`, {
-              width: groupNode.measured.width,
-              height: groupNode.measured.height
-            });
-        }
-    }
-  }, [onNodeMove, onGroupUpdate, nodes, groupsRef]);
+  }, [onNodeMove, onGroupUpdate, nodes]);
 
   const onPaneClick = useCallback((event: React.MouseEvent) => {
     if (event.detail === 2 && !readOnly) {
@@ -303,14 +250,14 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
     if (selectedNodes.length === 0) return;
 
     // 1. Prepare absolute positions snapshot to calculate correct bounds/relative pos
-    const { nodes: absNodes } = fromReactFlowNodes(nodes, groupsRef.current);
+    const { nodes: absNodes } = fromReactFlowNodes(nodes);
     const absNodeMap = new Map(absNodes.map(n => [n.id, n]));
 
     // 2. Collect involved old groups
     const involvedGroupIds = new Set<string>();
     selectedNodes.forEach(n => {
-        if (n.parentId) {
-            involvedGroupIds.add(n.parentId as string);
+        if (n.data._groupId) {
+            involvedGroupIds.add(n.data._groupId as string);
         }
     });
 
@@ -365,9 +312,6 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
 
     if (onGroupAdd) onGroupAdd(newGroup);
     
-    // Update groupsRef to preserve label and style
-    groupsRef.current = [...groupsRef.current.filter(g => !involvedGroupIds.has(g.id)), newGroup];
-    
     // Delete merged groups
     involvedGroupIds.forEach(oldGid => {
         if (onGroupDelete) onGroupDelete(oldGid);
@@ -381,35 +325,37 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         width: newGroup.width,
         height: newGroup.height,
         zIndex: -1,
-        data: {}, // ReactFlow requires data field
+        data: { label: newGroup.label, _isGroup: true },
         style: { width: newGroup.width, height: newGroup.height, zIndex: -1 },
-        selected: true,
-        draggable: true // Ensure group is draggable
+        selected: true
     };
 
     setNodes(nds => {
       // Remove merged group nodes
       let remainingNodes = nds.filter(n => n.type !== 'group' || !involvedGroupIds.has(n.id));
       
-      // Update members - 保留节点的所有数据
+      // Update members
       const updatedNodes = remainingNodes.map(n => {
         if (newGroupNodesMap.has(n.id)) {
+          if (onNodeDataChange) {
+             onNodeDataChange(n.id, { ...n.data, _groupId: groupId });
+          }
+          
           // Get absolute position from snapshot
           const absN = absNodeMap.get(n.id);
           const absX = absN?.position.x ?? n.position.x;
           const absY = absN?.position.y ?? n.position.y;
 
           return {
-            ...n, // 保留节点的所有属性（包括 width, height, measured 等）
-            parentId: groupId,
-            extent: 'parent' as const,
-            expandParent: true,
-            draggable: true,
+            ...n,
+            parentId: groupId, // NEW: Parent/Child linkage
+            expandParent: false, // Prevent child drag from resizing group
             position: {
                 x: absX - newGroup.position.x,
                 y: absY - newGroup.position.y
             },
             selected: false,
+            data: { ...n.data, _groupId: groupId }
           };
         }
         return n;
@@ -427,33 +373,31 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
     if (!targetId) return;
 
     // Prepare absolute positions
-    const { nodes: absNodes } = fromReactFlowNodes(nodes, groupsRef.current);
+    const { nodes: absNodes } = fromReactFlowNodes(nodes);
     const absNodeMap = new Map(absNodes.map(n => [n.id, n]));
 
-    // 收集编组内的节点ID
-    const nodeIdsInGroup = nodes.filter(n => n.parentId === targetId).map(n => n.id);
-    
-    // 通知上层解组（保留节点，只移除分组）
-    if (onGroupUngroup) {
-        onGroupUngroup(targetId, nodeIdsInGroup);
+    if (onGroupDelete) {
+        onGroupDelete(targetId);
     }
-    
-    // Remove group from groupsRef
-    groupsRef.current = groupsRef.current.filter(g => g.id !== targetId);
 
     setNodes(nds => {
         const filtered = nds.filter(n => n.id !== targetId);
         return filtered.map(n => {
-                if (n.parentId === targetId) {
+            if (n.data?._groupId === targetId || n.parentId === targetId) {
+                if (onNodeDataChange) {
+                    onNodeDataChange(n.id, { ...n.data, _groupId: undefined });
+                }
+                
                 // Restore absolute position
                 const absN = absNodeMap.get(n.id);
                 const absX = absN?.position.x ?? n.position.x;
                 const absY = absN?.position.y ?? n.position.y;
 
                 return { 
-                    ...n, // 保留节点的所有属性（包括 width, height, measured 等）
+                    ...n, 
                     parentId: undefined,
                     position: { x: absX, y: absY },
+                    data: { ...n.data, _groupId: undefined } 
                 };
             }
             return n;
@@ -461,7 +405,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
     });
 
     setContextMenu(null);
-  }, [contextMenu, nodes, setNodes, onGroupUngroup, onNodeDataChange]);
+  }, [contextMenu, nodes, setNodes, onGroupDelete, onNodeDataChange]);
 
   // --- Standard Actions ---
   const handleCopy = useCallback(() => {
@@ -488,12 +432,12 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         id: newNodeId,
         position,
         selected: true,
-        data: {}, // ReactFlow requires data field
+        data: { ...clipboard.data, _groupId: undefined }
       };
       setNodes((nds) => nds.map(n => ({ ...n, selected: false })).concat(newNode));
       setSelectedNodeId(newNodeId);
       if (onNodeAdd) {
-        const [canvasNode] = fromReactFlowNodes([newNode], groupsRef.current).nodes;
+        const [canvasNode] = fromReactFlowNodes([newNode]).nodes;
         onNodeAdd(canvasNode);
       }
     }
@@ -527,30 +471,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         if (onEdgeDelete) onEdgeDelete(targetId);
     } else {
         if (isGroup) {
-            // 删除分组：删除分组节点和其内部的所有节点
-            setNodes(nds => nds.filter(n => {
-                // 删除分组本身
-                if (n.id === targetId) return false;
-                // 删除分组内的子节点
-                if (n.parentId === targetId) return false;
-                return true;
-            }));
-            
-            // 同时删除相关连线
-            setEdges(eds => eds.filter(e => {
-                const sourceInGroup = nodes.find(n => 
-                    n.id === e.source && (n.id === targetId || n.parentId === targetId)
-                );
-                const targetInGroup = nodes.find(n => 
-                    n.id === e.target && (n.id === targetId || n.parentId === targetId)
-                );
-                return !sourceInGroup && !targetInGroup;
-            }));
-            
-            // 通知上层删除分组（会级联删除组内节点和连线）
-            if (onGroupDelete) onGroupDelete(targetId);
-            
-            // ❌ 不需要单独调用 onNodeDelete，onGroupDelete 会处理级联删除
+            handleUngroup();
         } else {
             setNodes(nds => nds.filter(n => n.id !== targetId));
             setEdges(eds => eds.filter(e => e.source !== targetId && e.target !== targetId));
@@ -558,7 +479,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         }
     }
     setContextMenu(null);
-  }, [contextMenu, nodes, edges, setNodes, setEdges, onNodeDelete, onEdgeDelete, onGroupDelete]);
+  }, [contextMenu, nodes, edges, setNodes, setEdges, onNodeDelete, onEdgeDelete, handleUngroup]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -623,7 +544,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
     if (contextMenu?.type === 'group') {
         items.push({
             label: '解散分组 (Ungroup)',
-            onClick: () => handleUngroup(contextMenu.targetId),
+            onClick: handleUngroup,
             icon: <Group size={16} />,
         });
     }
@@ -635,24 +556,11 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
     fitView: () => rfInstance?.fitView(),
     getViewport: () => rfInstance?.getViewport(),
     setFlow: (flow: CanvasFlowValue) => {
-      // Mark as internal update to skip onChange callback
-      isInternalUpdateRef.current = true;
       setNodes(toReactFlowNodes(flow.nodes, flow.groups));
       setEdges(toReactFlowEdges(flow.edges));
-      groupsRef.current = flow.groups || [];
-    },
-    getFlow: () => {
-      // 从 ReactFlow 的实时状态转换回 CanvasFlowValue
-      const { nodes: canvasNodes, groups: canvasGroups } = fromReactFlowNodes(nodes, groupsRef.current);
-      const canvasEdges = fromReactFlowEdges(edges);
-      return {
-        nodes: canvasNodes,
-        edges: canvasEdges,
-        groups: canvasGroups
-      };
     },
     ungroup: (groupId: string) => handleUngroup(groupId)
-  }), [rfInstance, setNodes, setEdges, handleUngroup, nodes, edges]);
+  }), [rfInstance, setNodes, setEdges, handleUngroup]);
 
   return (
     <div 
@@ -677,10 +585,9 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         nodeTypes={reactFlowNodeTypes}
         onSelectionChange={onSelectionChangeInternal}
         fitView
-        minZoom={0.2}
         nodesDraggable={!readOnly}
         nodesConnectable={!readOnly}
-        deleteKeyCode={['Delete']}
+        deleteKeyCode={['Backspace', 'Delete']}
         selectionKeyCode={['Shift']} 
       >
         <Background />
