@@ -88,6 +88,7 @@ export interface CanvasFlowHandle {
   setNodeVideo(nodeId: string, src: string): void;
   setNodeAudio(nodeId: string, src: string): void;
   setNodeText(nodeId: string, text: string): void;
+  setNodeTitle(nodeId: string, title: string): void;
   setNodeOutput(nodeId: string, outputData: any): void;
   
   // 上传节点专用 API
@@ -221,6 +222,7 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
       // 媒体内容字段
       'src',           // 图片/视频/音频 URL
       'text',          // 文本内容
+      'title',         // 节点标题
       'outputData',    // 通用输出数据
       'output',        // 兼容旧字段
       
@@ -381,6 +383,16 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
     setNodeText: (nodeId: string, text: string) => {
       if (validateNodeType(nodeId, 'text', 'setNodeText')) {
         updateMediaData(nodeId, { text });
+      }
+    },
+    
+    setNodeTitle: (nodeId: string, title: string) => {
+      // 任何节点都可以设置 title，只需验证节点存在
+      const node = findNode(nodeId);
+      if (node) {
+        updateMediaData(nodeId, { title });
+      } else {
+        console.warn(`[setNodeTitle] 节点不存在: ${nodeId}`);
       }
     },
     

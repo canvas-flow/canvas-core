@@ -888,7 +888,7 @@ video::-webkit-media-controls-enclosure {
 
 .inspector-ref-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   background: rgba(50, 50, 50, 0.3);
   border-radius: 6px;
@@ -897,9 +897,11 @@ video::-webkit-media-controls-enclosure {
   color: #aaa;
   position: relative;
   overflow: hidden;
+  transition: all 0.2s ease;
+  cursor: default;
 }
 
-/* Left line indicator */
+/* Left line indicator - default gray */
 .inspector-ref-item::before {
   content: '';
   position: absolute;
@@ -908,6 +910,61 @@ video::-webkit-media-controls-enclosure {
   bottom: 0;
   width: 3px;
   background: #444;
+  transition: background 0.2s ease;
+}
+
+/* 🔥 第一个引用的左侧高亮 */
+.inspector-ref-item.inspector-ref-first::before {
+  background: #666;
+}
+
+.inspector-ref-item.inspector-ref-first {
+  background: rgba(60, 60, 60, 0.5);
+}
+
+/* 拖动手柄 */
+.inspector-ref-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  cursor: grab;
+  padding: 2px;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.inspector-ref-drag-handle:hover {
+  color: #888;
+}
+
+.inspector-ref-drag-handle:active {
+  cursor: grabbing;
+}
+
+/* 拖动中的项 */
+.inspector-ref-item.inspector-ref-dragging {
+  opacity: 0.5;
+  background: rgba(80, 80, 80, 0.3);
+}
+
+/* 拖动经过的目标项 */
+.inspector-ref-item.inspector-ref-dragover {
+  background: rgba(70, 130, 200, 0.2);
+  border: 1px dashed rgba(100, 160, 230, 0.5);
+}
+
+.inspector-ref-item.inspector-ref-dragover::before {
+  background: #5090d0;
+}
+
+/* 可拖动时的 hover 效果 */
+.inspector-ref-item[draggable="true"]:hover {
+  background: rgba(60, 60, 60, 0.5);
+}
+
+.inspector-ref-item[draggable="true"]:hover .inspector-ref-drag-handle {
+  color: #999;
 }
 
 .inspector-ref-content {

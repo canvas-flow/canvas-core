@@ -588,7 +588,8 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         nodesDraggable={!readOnly}
         nodesConnectable={!readOnly}
         deleteKeyCode={['Backspace', 'Delete']}
-        selectionKeyCode={['Shift']} 
+        selectionKeyCode={['Shift']}
+        noPanClassName="nopan"
       >
         <Background />
         <SelectionMenu 
