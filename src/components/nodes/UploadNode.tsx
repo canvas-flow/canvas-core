@@ -66,11 +66,33 @@ export const UploadNode: React.FC<NodeContentProps> = ({ data, onChange }) => {
     if (!mediaUrl) return null;
 
     const fileType = data.fileType || '';
-    const isImage = fileType.startsWith('image/');
-    const isVideo = fileType.startsWith('video/');
     
-    if (isImage || !fileType) {
-      // 如果没有 fileType，尝试作为图片渲染
+    // ✅ 通过 URL 扩展名判断媒体类型（作为 fallback）
+    const getMediaTypeFromUrl = (url: string): 'image' | 'video' | 'unknown' => {
+      const ext = url.split('?')[0].split('.').pop()?.toLowerCase();
+      if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '')) return 'image';
+      if (['mp4', 'webm', 'mov', 'avi', 'mkv', 'm4v'].includes(ext || '')) return 'video';
+      return 'unknown';
+    };
+    
+    const urlMediaType = getMediaTypeFromUrl(mediaUrl);
+    
+    // ✅ 优先使用 fileType，fallback 到 URL 扩展名判断
+    const isVideo = fileType.startsWith('video/') || urlMediaType === 'video';
+    const isImage = fileType.startsWith('image/') || urlMediaType === 'image';
+    
+    // ✅ 视频优先判断（避免视频被误渲染为图片）
+    if (isVideo) {
+      return (
+        <video 
+          src={mediaUrl} 
+          className="cf-upload-preview-video"
+          controls
+        />
+      );
+    }
+
+    if (isImage) {
       return (
         <img 
           src={mediaUrl} 
@@ -83,17 +105,12 @@ export const UploadNode: React.FC<NodeContentProps> = ({ data, onChange }) => {
       );
     }
 
-    if (isVideo) {
-      return (
-        <video 
-          src={mediaUrl} 
-          className="cf-upload-preview-video"
-          controls
-        />
-      );
-    }
-
-    return null;
+    // ✅ 未知类型，显示文件名
+    return (
+      <div className="cf-upload-preview-file">
+        {data.fileName || '未知文件'}
+      </div>
+    );
   };
 
   // ✅ 渲染上传区域
