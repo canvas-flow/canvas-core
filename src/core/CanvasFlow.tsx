@@ -19,6 +19,14 @@ export interface CanvasFlowUIOptions {
   showToolbar?: boolean;
 }
 
+/** 自定义右键菜单项 */
+export interface CustomContextMenuItem {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  icon?: React.ReactNode;
+}
+
 export interface CanvasFlowProps {
   initialFlow?: CanvasFlowValue;
   /** @deprecated Use config and components instead */
@@ -38,6 +46,19 @@ export interface CanvasFlowProps {
     nodeId: string;
     node: CanvasFlowNode;
   }) => React.ReactNode;
+  
+  /**
+   * 自定义节点右键菜单项
+   * @param nodeId - 右键点击的节点 ID
+   * @param node - 节点数据
+   * @param mediaData - 节点的媒体数据（从 mediaMap 获取）
+   * @returns 自定义菜单项数组（会追加到默认菜单项之后）
+   */
+  getNodeContextMenuItems?: (
+    nodeId: string,
+    node: CanvasFlowNode,
+    mediaData: any
+  ) => CustomContextMenuItem[];
   
   onChange?: (flow: CanvasFlowValue) => void;
   onSave?: (flow: CanvasFlowValue) => void;
@@ -146,6 +167,9 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
     onGroupDelete,
     onGroupUngroup,
     onGroupUpdate,
+    
+    // Custom context menu
+    getNodeContextMenuItems,
     
     className,
     style
@@ -743,6 +767,7 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
       getNodeMedia={getNodeMedia}
       updateNodeMedia={updateNodeMedia}
       renderNodeInspector={renderNodeInspector}
+      getNodeContextMenuItems={getNodeContextMenuItems}
     >
       <div className={`canvas-flow-container ${className || ''}`} style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', ...style }}>
         <CanvasEditor

@@ -58,7 +58,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
   onGroupDelete,
   onGroupUpdate,
 }, _ref) => {
-  const { config, onNodeDataChange } = useCanvasContext();
+  const { config, onNodeDataChange, getNodeContextMenuItems, getNodeMedia } = useCanvasContext();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   
@@ -549,8 +549,35 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         });
     }
 
+    // 🔥 添加自定义菜单项（仅节点右键菜单）
+    if (contextMenu?.type === 'node' && contextMenu.targetId && getNodeContextMenuItems) {
+      const targetNode = nodes.find(n => n.id === contextMenu.targetId);
+      if (targetNode) {
+        // 从 ReactFlow 节点转换为 CanvasFlowNode
+        const { nodes: canvasNodes } = fromReactFlowNodes(nodes);
+        const canvasNode = canvasNodes.find(n => n.id === contextMenu.targetId);
+        
+        if (canvasNode) {
+          const mediaData = getNodeMedia(contextMenu.targetId);
+          const customItems = getNodeContextMenuItems(contextMenu.targetId, canvasNode, mediaData);
+          
+          if (customItems.length > 0) {
+            // 添加分隔线效果（通过空项或在 UI 中处理）
+            customItems.forEach(item => {
+              items.push({
+                label: item.label,
+                onClick: item.onClick,
+                disabled: item.disabled,
+                icon: item.icon,
+              });
+            });
+          }
+        }
+      }
+    }
+
     return items;
-  }, [contextMenu, clipboard, handleCopy, handlePaste, handleDelete, handleCreateGroup, handleUngroup]);
+  }, [contextMenu, clipboard, handleCopy, handlePaste, handleDelete, handleCreateGroup, handleUngroup, nodes, getNodeContextMenuItems, getNodeMedia]);
 
   React.useImperativeHandle(_ref, () => ({
     fitView: () => rfInstance?.fitView(),

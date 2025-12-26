@@ -5,6 +5,14 @@ import { NodeMediaEmitter } from './NodeMediaEmitter';
 
 export type GroupActionType = 'create' | 'delete' | 'update' | 'move' | 'ungroup' | 'run' | 'save';
 
+/** 自定义右键菜单项 */
+export interface CustomContextMenuItem {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  icon?: React.ReactNode;
+}
+
 interface CanvasContextValue {
   config: CanvasConfig;
   components: ComponentRegistry;
@@ -31,6 +39,12 @@ interface CanvasContextValue {
     nodeId: string;
     node: CanvasFlowNode;
   }) => React.ReactNode;
+  // Custom context menu items
+  getNodeContextMenuItems?: (
+    nodeId: string,
+    node: CanvasFlowNode,
+    mediaData: any
+  ) => CustomContextMenuItem[];
 }
 
 const CanvasContext = createContext<CanvasContextValue | null>(null);
