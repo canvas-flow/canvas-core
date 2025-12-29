@@ -39,6 +39,7 @@ interface CanvasEditorProps {
 
   onGroupAdd?: (group: CanvasFlowGroup) => void;
   onGroupDelete?: (groupId: string) => void;
+  onGroupUngroup?: (groupId: string, nodeIds: string[]) => void;
   onGroupUpdate?: (group: Partial<CanvasFlowGroup> & { id: string }) => void;
 }
 
@@ -56,6 +57,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
   onEdgeDelete,
   onGroupAdd,
   onGroupDelete,
+  onGroupUngroup,
   onGroupUpdate,
 }, _ref) => {
   const { config, onNodeDataChange, getNodeContextMenuItems, getNodeMedia } = useCanvasContext();
@@ -376,8 +378,13 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
     const { nodes: absNodes } = fromReactFlowNodes(nodes);
     const absNodeMap = new Map(absNodes.map(n => [n.id, n]));
 
-    if (onGroupDelete) {
-        onGroupDelete(targetId);
+    // 收集分组内的节点 ID
+    const nodesInGroup = nodes.filter(n => n.data?._groupId === targetId || n.parentId === targetId);
+    const nodeIds = nodesInGroup.map(n => n.id);
+
+    // ✅ 调用 onGroupUngroup 而不是 onGroupDelete
+    if (onGroupUngroup) {
+        onGroupUngroup(targetId, nodeIds);
     }
 
     setNodes(nds => {
@@ -405,7 +412,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
     });
 
     setContextMenu(null);
-  }, [contextMenu, nodes, setNodes, onGroupDelete, onNodeDataChange]);
+  }, [contextMenu, nodes, setNodes, onGroupUngroup, onNodeDataChange]);
 
   // --- Standard Actions ---
   const handleCopy = useCallback(() => {
@@ -471,7 +478,22 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         if (onEdgeDelete) onEdgeDelete(targetId);
     } else {
         if (isGroup) {
-            handleUngroup();
+            // 删除分组：只调用 onGroupDelete，由 demo 层处理级联删除
+            // ⚠️ 注意：不要为每个节点单独调用 onNodeDelete，避免发送多余的请求
+            if (onGroupDelete) {
+                onGroupDelete(targetId);
+            }
+            
+            // 本地状态更新：移除分组和分组内的节点
+            const nodesInGroup = nodes.filter(n => n.parentId === targetId || n.data?._groupId === targetId);
+            const nodeIdsToDelete = nodesInGroup.map(n => n.id);
+            
+            setNodes(nds => nds.filter(n => n.id !== targetId && !nodeIdsToDelete.includes(n.id)));
+            
+            // 删除相关的边
+            setEdges(eds => eds.filter(e => 
+                !nodeIdsToDelete.includes(e.source) && !nodeIdsToDelete.includes(e.target)
+            ));
         } else {
             setNodes(nds => nds.filter(n => n.id !== targetId));
             setEdges(eds => eds.filter(e => e.source !== targetId && e.target !== targetId));
@@ -479,7 +501,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         }
     }
     setContextMenu(null);
-  }, [contextMenu, nodes, edges, setNodes, setEdges, onNodeDelete, onEdgeDelete, handleUngroup]);
+  }, [contextMenu, nodes, edges, setNodes, setEdges, onNodeDelete, onEdgeDelete, onGroupDelete]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
