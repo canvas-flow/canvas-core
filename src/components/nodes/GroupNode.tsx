@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback, useMemo } from 'react';
-import { NodeProps, NodeResizer, useReactFlow } from '@xyflow/react';
+import { NodeProps, NodeResizer, useReactFlow, useViewport } from '@xyflow/react';
 import { Play, Ungroup, Save } from 'lucide-react';
 import { useCanvasContext } from '../../core/CanvasContext';
 import { ActionToolbar, ToolbarAction } from './ActionToolbar';
@@ -7,11 +7,15 @@ import { ActionToolbar, ToolbarAction } from './ActionToolbar';
 export const GroupNode = memo(({ id, data, selected }: NodeProps) => {
   const { setNodes } = useReactFlow();
   const { onGroupAction } = useCanvasContext();
+  const { zoom } = useViewport();
   
   const [isEditing, setIsEditing] = useState(false);
   const [labelInput, setLabelInput] = useState(data.label as string || 'Group');
 
   const style = data.style as any;
+  
+  // 反向缩放，使标题文字大小固定不随画布缩放
+  const inverseScale = 1 / zoom;
   
   const handleRename = useCallback(() => {
     setIsEditing(false);
@@ -105,18 +109,20 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps) => {
         onResizeEnd={handleResizeEnd}
       />
       
-      {/* Header / Title Bar */}
+      {/* Header / Title Bar - 使用反向缩放使标题固定大小 */}
       <div 
         style={{
           position: 'absolute',
-          top: -34,
+          top: -34 * inverseScale,
           left: 0,
-          right: 0,
           height: 30,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-start',
+          gap: 8,
           pointerEvents: 'none', // Let clicks pass through to underlying area unless hitting buttons
+          transform: `scale(${inverseScale})`,
+          transformOrigin: 'left top',
         }}
       >
         {/* Label */}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useViewport } from '@xyflow/react';
 
 interface NodeTitleEditorProps {
   title: string;
@@ -14,6 +15,10 @@ export const NodeTitleEditor: React.FC<NodeTitleEditorProps> = ({
   className = ''
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const { zoom } = useViewport();
+  
+  // 反向缩放，使标题文字大小固定不随画布缩放
+  const inverseScale = 1 / zoom;
 
   // 显示的标题（优先级：自定义标题 > 默认标题）
   const displayTitle = title || defaultTitle;
@@ -46,7 +51,7 @@ export const NodeTitleEditor: React.FC<NodeTitleEditorProps> = ({
         onMouseDown={(e) => e.stopPropagation()}
         style={{
           position: 'absolute',
-          top: '-24px',
+          top: `${-24 * inverseScale}px`,
           left: '0',
           background: 'rgba(0, 0, 0, 0.8)',
           border: '1px solid #555',
@@ -58,6 +63,8 @@ export const NodeTitleEditor: React.FC<NodeTitleEditorProps> = ({
           outline: 'none',
           minWidth: '50px',
           maxWidth: '200px',
+          transform: `scale(${inverseScale})`,
+          transformOrigin: 'left top',
         }}
       />
     );
@@ -70,7 +77,7 @@ export const NodeTitleEditor: React.FC<NodeTitleEditorProps> = ({
       title={displayTitle}
       style={{
         position: 'absolute',
-        top: '-24px',
+        top: `${-24 * inverseScale}px`,
         left: '0',
         color: '#888',
         fontSize: '13px',
@@ -79,6 +86,8 @@ export const NodeTitleEditor: React.FC<NodeTitleEditorProps> = ({
         cursor: 'text',
         transition: 'color 0.2s',
         pointerEvents: 'auto',
+        transform: `scale(${inverseScale})`,
+        transformOrigin: 'left top',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.color = '#ccc';
