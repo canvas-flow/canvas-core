@@ -842,6 +842,60 @@ const CanvasProvider = ({ children: e, ...t }) => /* @__PURE__ */ (0, import_jsx
 	let e = useContext(CanvasContext);
 	if (!e) throw Error("useCanvasContext must be used within a CanvasProvider");
 	return e;
+}, NodeTitleEditor = ({ title: e, defaultTitle: t, onChange: n, className: r = "" }) => {
+	let [i, a] = useState(!1), o = e || t, s = o.length > 15 ? o.slice(0, 15) + "..." : o;
+	return i ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+		className: `nodrag canvas-node-title-input ${r}`,
+		autoFocus: !0,
+		onBlur: () => a(!1),
+		placeholder: "输入标题...",
+		value: e || "",
+		onChange: (e) => {
+			n({ title: e.target.value.slice(0, 15) });
+		},
+		onKeyDown: (e) => {
+			e.stopPropagation(), e.key === "Escape" && a(!1);
+		},
+		onMouseDown: (e) => e.stopPropagation(),
+		style: {
+			position: "absolute",
+			top: "-24px",
+			left: "0",
+			background: "rgba(0, 0, 0, 0.8)",
+			border: "1px solid #555",
+			borderRadius: "4px",
+			padding: "2px 6px",
+			color: "#fff",
+			fontSize: "13px",
+			fontWeight: "500",
+			outline: "none",
+			minWidth: "50px",
+			maxWidth: "200px"
+		}
+	}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: `canvas-node-title ${r}`,
+		onDoubleClick: () => a(!0),
+		title: o,
+		style: {
+			position: "absolute",
+			top: "-24px",
+			left: "0",
+			color: "#888",
+			fontSize: "13px",
+			fontWeight: "500",
+			whiteSpace: "nowrap",
+			cursor: "text",
+			transition: "color 0.2s",
+			pointerEvents: "auto"
+		},
+		onMouseEnter: (e) => {
+			e.currentTarget.style.color = "#ccc";
+		},
+		onMouseLeave: (e) => {
+			e.currentTarget.style.color = "#888";
+		},
+		children: s
+	});
 };
 function useDebouncedCallback(e, t) {
 	let n = useRef(e), r = useRef(void 0);
@@ -877,9 +931,26 @@ const UniversalNode = memo((e) => {
 	let M = o[j.component], N = useDebouncedCallback((e, t) => {
 		h && h(e, t);
 	}, 500), P = (e) => {
-		k((t) => ({
-			...t,
+		let n = {
+			...O,
 			...e
+		};
+		k(n), y.set(t, n), b.emit(t, n), T((n) => n.map((n) => {
+			if (n.id === t) {
+				let r = {
+					...n.data,
+					...e
+				};
+				return console.log("[handleNodeChange] 更新节点数据:", {
+					nodeId: t,
+					newData: e,
+					mergedData: r
+				}), {
+					...n,
+					data: r
+				};
+			}
+			return n;
 		})), N(t, e);
 	}, F = D.some((e) => e.source === t || e.target === t), I = useNodesData(useMemo(() => D.filter((e) => e.target === t).map((e) => e.source), [D, t]));
 	useMemo(() => I ? (Array.isArray(I) ? I : [I]).map((e) => {
@@ -927,9 +998,10 @@ const UniversalNode = memo((e) => {
 					}
 				})
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "canvas-node-label",
-				children: j.label
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NodeTitleEditor, {
+				title: O.title || "",
+				defaultTitle: j.label,
+				onChange: P
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Handle, {
 				type: "target",
@@ -1018,168 +1090,178 @@ const UniversalNode = memo((e) => {
 			})
 		]
 	});
-}), ActionToolbar = ({ actions: t, className: n = "", style: r, visible: i = !0 }) => !i || t.length === 0 ? null : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	className: `canvas-node-toolbar ${n}`,
-	style: r,
-	onMouseDown: (e) => e.stopPropagation(),
-	children: t.map((t) => {
-		let n = t.icon;
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-			className: `canvas-node-toolbar-item ${t.className || ""}`,
-			onClick: t.onClick,
-			title: t.title || t.label,
-			children: [t.icon && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-				className: "toolbar-item-icon",
-				children: React.isValidElement(t.icon) ? t.icon : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(n, { size: 14 })
-			}), t.label && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-				className: "toolbar-item-label",
-				children: t.label
-			})]
-		}, t.id);
-	})
-}), GroupNode = memo(({ id: e, data: t, selected: n }) => {
-	let { setNodes: r } = useReactFlow(), { onGroupAction: i } = useCanvasContext(), [o, s] = useState(!1), [c, u] = useState(t.label || "Group"), f = t.style, p = useCallback(() => {
-		s(!1), r((t) => t.map((t) => t.id === e ? {
-			...t,
+}), GroupNode = memo(({ id: t, data: n, selected: r }) => {
+	let { setNodes: i } = useReactFlow(), { onGroupAction: o } = useCanvasContext(), [s, c] = useState(!1), [u, f] = useState(n.label || "Group"), p = n.style, m = useCallback(() => {
+		c(!1), i((e) => e.map((e) => e.id === t ? {
+			...e,
 			data: {
-				...t.data,
-				label: c
+				...e.data,
+				label: u
 			}
-		} : t)), i && i("update", {
-			id: e,
-			label: c
+		} : e)), o && o("update", {
+			id: t,
+			label: u
 		});
 	}, [
-		e,
-		c,
-		r,
-		i
-	]), m = useCallback((t) => {
-		t.stopPropagation(), i && i("ungroup", { id: e });
-	}, [e, i]), h = useCallback((t) => {
-		t.stopPropagation(), i && i("run", { id: e });
-	}, [e, i]), _ = useMemo(() => [
+		t,
+		u,
+		i,
+		o
+	]), h = useCallback((e) => {
+		e.stopPropagation(), o && o("ungroup", { id: t });
+	}, [t, o]), _ = useCallback((e) => {
+		e.stopPropagation(), o && o("run", { id: t });
+	}, [t, o]), v = useMemo(() => [
 		{
 			id: "run",
 			label: "整组执行",
 			icon: Play,
-			onClick: h,
+			onClick: _,
 			className: "text-green"
 		},
 		{
 			id: "save",
 			label: "保存",
 			icon: Save,
-			onClick: (t) => {
-				t.stopPropagation(), i && i("save", { id: e });
+			onClick: (e) => {
+				e.stopPropagation(), o && o("save", { id: t });
 			}
 		},
 		{
 			id: "ungroup",
 			label: "解组",
 			icon: Ungroup,
-			onClick: m
+			onClick: h
 		}
-	], [h, m]), v = t.toolbarActions || _, y = useCallback((t, n) => {
-		i && i("update", {
-			id: e,
+	], [_, h]), y = n.toolbarActions || v, b = useCallback((e, n) => {
+		o && o("update", {
+			id: t,
 			width: n.width,
 			height: n.height,
 			style: {
-				...f,
+				...p,
 				width: n.width,
 				height: n.height
 			}
 		});
 	}, [
-		e,
-		f,
-		i
+		t,
+		p,
+		o
 	]);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		style: {
 			width: "100%",
 			height: "100%",
-			backgroundColor: f?.backgroundColor || "rgba(30, 30, 30, 0.6)",
-			border: n ? "1px solid #ffffff" : "1px solid rgba(255,255,255,0.1)",
+			backgroundColor: p?.backgroundColor || "rgba(30, 30, 30, 0.6)",
+			border: r ? "1px solid #ffffff" : "1px solid rgba(255,255,255,0.1)",
 			borderRadius: 12,
 			position: "relative",
 			transition: "all 0.2s ease",
-			boxShadow: n ? "0 0 0 2px rgba(255, 255, 255, 0.2)" : "none"
+			boxShadow: r ? "0 0 0 2px rgba(255, 255, 255, 0.2)" : "none"
 		},
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NodeResizer, {
-			minWidth: 100,
-			minHeight: 100,
-			isVisible: !!n,
-			lineStyle: { border: "none" },
-			handleStyle: {
-				width: 10,
-				height: 10,
-				borderRadius: 2
-			},
-			color: "#ffffff",
-			onResizeEnd: y
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			style: {
-				position: "absolute",
-				top: -34,
-				left: 0,
-				right: 0,
-				height: 30,
-				display: "flex",
-				alignItems: "center",
-				justifyContent: "space-between",
-				pointerEvents: "none"
-			},
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NodeResizer, {
+				minWidth: 100,
+				minHeight: 100,
+				isVisible: !!r,
+				lineStyle: { border: "none" },
+				handleStyle: {
+					width: 10,
+					height: 10,
+					borderRadius: 2
+				},
+				color: "#ffffff",
+				onResizeEnd: b
+			}),
+			s ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+				autoFocus: !0,
+				value: u,
+				onChange: (e) => f(e.target.value),
+				onBlur: m,
+				onKeyDown: (e) => e.key === "Enter" && m(),
+				onMouseDown: (e) => e.stopPropagation(),
+				className: "canvas-node-title-input",
 				style: {
-					padding: "4px 8px",
-					backgroundColor: "rgba(0,0,0,0.5)",
-					borderRadius: 4,
-					color: "#ccc",
-					fontSize: 12,
-					cursor: "text",
-					fontWeight: 500,
-					pointerEvents: "auto",
+					position: "absolute",
+					top: -24,
+					left: 0
+				}
+			}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "canvas-node-title",
+				style: {
+					position: "absolute",
+					top: -24,
+					left: 0
+				},
+				onDoubleClick: () => c(!0),
+				children: n.label
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				style: {
+					position: "absolute",
+					top: -56,
+					left: "50%",
+					transform: "translateX(-50%)",
 					display: "flex",
 					alignItems: "center",
-					maxWidth: "60%"
+					justifyContent: "center",
+					pointerEvents: "none",
+					opacity: r ? 1 : 0,
+					transition: "opacity 0.2s"
 				},
-				onDoubleClick: () => s(!0),
-				children: o ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
-					autoFocus: !0,
-					value: c,
-					onChange: (e) => u(e.target.value),
-					onBlur: p,
-					onKeyDown: (e) => e.key === "Enter" && p(),
-					onMouseDown: (e) => e.stopPropagation(),
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "group-toolbar-capsule",
 					style: {
-						background: "transparent",
-						border: "none",
-						color: "inherit",
-						outline: "none",
-						width: "100%",
-						minWidth: 50
-					}
-				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-					style: {
-						whiteSpace: "nowrap",
-						overflow: "hidden",
-						textOverflow: "ellipsis"
+						display: "flex",
+						alignItems: "center",
+						background: "#1e1e1e",
+						borderRadius: 20,
+						padding: "6px 8px",
+						gap: 2,
+						boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+						border: "1px solid #333",
+						pointerEvents: r ? "auto" : "none"
 					},
-					children: t.label
+					onMouseDown: (e) => e.stopPropagation(),
+					children: y.map((t) => {
+						let n = t.icon, r = t.className?.includes("text-green");
+						return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+							onClick: t.onClick,
+							title: t.title || t.label,
+							style: {
+								display: "flex",
+								alignItems: "center",
+								gap: 5,
+								padding: "6px 12px",
+								borderRadius: 14,
+								cursor: "pointer",
+								color: r ? "#4ade80" : "#ccc",
+								fontSize: 13,
+								fontWeight: 500,
+								border: "none",
+								background: "transparent",
+								whiteSpace: "nowrap",
+								transition: "all 0.15s"
+							},
+							onMouseEnter: (e) => {
+								e.currentTarget.style.background = r ? "rgba(74, 222, 128, 0.15)" : "#2a2a2a", e.currentTarget.style.color = r ? "#4ade80" : "#fff";
+							},
+							onMouseLeave: (e) => {
+								e.currentTarget.style.background = "transparent", e.currentTarget.style.color = r ? "#4ade80" : "#ccc";
+							},
+							children: [t.icon && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								style: {
+									display: "flex",
+									alignItems: "center"
+								},
+								children: React.isValidElement(t.icon) ? t.icon : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(n, { size: 14 })
+							}), t.label && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: t.label })]
+						}, t.id);
+					})
 				})
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ActionToolbar, {
-				actions: v,
-				visible: !0,
-				style: {
-					marginLeft: "auto",
-					opacity: n ? 1 : 0,
-					transition: "opacity 0.2s",
-					pointerEvents: n ? "auto" : "none"
-				}
-			})]
-		})]
+			})
+		]
 	});
 }), SelectionMenu = ({ selectedNodes: e, onCreateGroup: t }) => {
 	let { flowToScreenPosition: n, getNodes: r } = useReactFlow(), i = e.filter((e) => e.type !== "group");
@@ -1399,113 +1481,89 @@ function useCanvasConnection({ nodes: e, edges: t, setEdges: n, setNodes: r, onE
 	};
 }
 const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onChange: r, onSelectionChange: i, renderEmpty: o, onNodeAdd: c, onNodeMove: m, onNodeDelete: h, onNodeDataChange: g, onEdgeAdd: _, onEdgeDelete: v, onGroupAdd: b, onGroupDelete: x, onGroupUngroup: S, onGroupUpdate: w }, T) => {
-	let { config: E, onNodeDataChange: D } = useCanvasContext(), [O, k, A] = useNodesState([]), [j, M, N] = useEdgesState([]), [R, pe] = useState(null), { isConnecting: me, connectionMenu: z, setConnectionMenu: he, isValidConnection: B, onConnect: V, onConnectStart: H, onConnectEnd: U, handleMenuAddNode: W, availableNodeTypes: _e } = useCanvasConnection({
-		nodes: O,
-		edges: j,
-		setEdges: M,
-		setNodes: k,
+	let { config: E, onNodeDataChange: D, getNodeContextMenuItems: O, getNodeMedia: k } = useCanvasContext(), [A, j, M] = useNodesState([]), [N, R, pe] = useEdgesState([]), [z, me] = useState(null), { isConnecting: B, connectionMenu: he, setConnectionMenu: V, isValidConnection: H, onConnect: U, onConnectStart: W, onConnectEnd: ge, handleMenuAddNode: _e, availableNodeTypes: ve } = useCanvasConnection({
+		nodes: A,
+		edges: N,
+		setEdges: R,
+		setNodes: j,
 		onEdgeAdd: _,
 		onNodeAdd: c,
 		config: E,
-		rfInstance: R
-	}), [G, K] = useState(null), [q, xe] = useState(null), [Se, Ce] = useState({
+		rfInstance: z
+	}), [K, q] = useState(null), [J, Ce] = useState(null), [we, Te] = useState({
 		x: 0,
 		y: 0
-	}), [we, J] = useState(null), Y = useRef([]), Te = useRef(!1);
+	}), [Ee, Y] = useState(null);
 	useEffect(() => {
-		t && (k(toReactFlowNodes(t.nodes, t.groups)), M(toReactFlowEdges(t.edges)), Y.current = t.groups || []);
+		t && (j(toReactFlowNodes(t.nodes, t.groups)), R(toReactFlowEdges(t.edges)));
 	}, []);
-	let Ee = useRef(r);
+	let De = useRef(r);
 	useEffect(() => {
-		Ee.current = r;
+		De.current = r;
 	}, [r]), useEffect(() => {
-		if (Te.current) {
-			Te.current = !1;
-			return;
-		}
-		if (Ee.current) {
-			let { nodes: e, groups: t } = fromReactFlowNodes(O, Y.current), n = {
+		if (De.current) {
+			let { nodes: e, groups: t } = fromReactFlowNodes(A), n = {
 				nodes: e,
-				edges: fromReactFlowEdges(j),
+				edges: fromReactFlowEdges(N),
 				groups: t
 			};
-			Ee.current(n);
+			De.current(n);
 		}
-	}, [O, j]), useEffect(() => {
+	}, [A, N]), useEffect(() => {
 		let e = (e) => {
-			Ce({
+			Te({
 				x: e.clientX,
 				y: e.clientY
 			});
 		};
 		return window.addEventListener("mousemove", e), () => window.removeEventListener("mousemove", e);
 	}, []);
-	let De = useMemo(() => {
+	let Oe = useMemo(() => {
 		let e = { group: GroupNode };
 		return E.nodeDefinitions.forEach((t) => {
 			e[t.type] = UniversalNode;
 		}), e;
-	}, [E.nodeDefinitions]), Oe = useCallback((e) => {
-		A(e), e.forEach((e) => {
-			e.type === "remove" && (O.find((t) => t.id === e.id)?.type === "group" ? x && x(e.id) : h && h(e.id));
+	}, [E.nodeDefinitions]), ke = useCallback((e) => {
+		M(e), e.forEach((e) => {
+			e.type === "remove" && h && h(e.id);
 		});
-	}, [
-		A,
-		h,
-		x,
-		O
-	]), ke = useCallback((e) => {
-		N(e), e.forEach((e) => {
+	}, [M, h]), Ae = useCallback((e) => {
+		pe(e), e.forEach((e) => {
 			e.type === "remove" && v && v(e.id);
 		});
-	}, [N, v]), Ae = useCallback(({ nodes: e }) => {
+	}, [pe, v]), je = useCallback(({ nodes: e }) => {
 		if (e.length > 0) {
 			let t = e[0];
-			t.type === "group" ? J(null) : J(t.id);
-		} else J(null);
+			t.type === "group" ? Y(null) : Y(t.id);
+		} else Y(null);
 		i && i(e.filter((e) => e.type !== "group").map((e) => e.id));
-	}, [i]), je = useCallback((e, t, n) => {
+	}, [i]), Me = useCallback((e, t, n) => {
 		if (t.type === "group") {
 			w && w({
 				id: t.id,
-				position: t.position,
-				width: t.measured?.width || t.width,
-				height: t.measured?.height || t.height
+				position: t.position
 			});
 			return;
 		}
 		if (m) {
-			let { nodes: e } = fromReactFlowNodes(n, Y.current), r = e.find((e) => e.id === t.id);
-			r && m(r);
-		}
-		if (t.parentId && w) {
-			let e = n.find((e) => e.id === t.parentId);
-			e && e.measured && (w({
-				id: e.id,
-				position: e.position,
-				width: e.measured.width,
-				height: e.measured.height
-			}), console.log(`[编组自动扩展] 保存编组 ${e.id} 的新尺寸:`, {
-				width: e.measured.width,
-				height: e.measured.height
-			}));
+			let { nodes: e } = fromReactFlowNodes(A), n = e.find((e) => e.id === t.id);
+			n && m(n);
 		}
 	}, [
 		m,
 		w,
-		O,
-		Y
-	]), Me = useCallback((e) => {
-		e.detail === 2 && !n && he({
+		A
+	]), Ne = useCallback((e) => {
+		e.detail === 2 && !n && V({
 			isOpen: !0,
 			position: {
 				x: e.clientX,
 				y: e.clientY
 			},
 			source: null
-		}), K(null);
-	}, [n]), Ne = useCallback((e, t) => {
-		e.preventDefault(), e.stopPropagation(), K({
+		}), q(null);
+	}, [n]), Pe = useCallback((e, t) => {
+		e.preventDefault(), e.stopPropagation(), q({
 			isOpen: !0,
 			position: {
 				x: e.clientX,
@@ -1514,10 +1572,10 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 			type: t.type === "group" ? "group" : "node",
 			targetId: t.id
 		});
-	}, []), Pe = useCallback((e) => {
+	}, []), Fe = useCallback((e) => {
 		e.preventDefault();
-		let t = O.filter((e) => e.selected && e.type !== "group");
-		K({
+		let t = A.filter((e) => e.selected && e.type !== "group");
+		q({
 			isOpen: !0,
 			position: {
 				x: e.clientX,
@@ -1525,8 +1583,8 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 			},
 			type: t.length > 1 ? "multi" : "pane"
 		});
-	}, [O]), Fe = useCallback((e, t) => {
-		e.preventDefault(), e.stopPropagation(), K({
+	}, [A]), Ie = useCallback((e, t) => {
+		e.preventDefault(), e.stopPropagation(), q({
 			isOpen: !0,
 			position: {
 				x: e.clientX,
@@ -1536,11 +1594,11 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 			targetId: t.id
 		});
 	}, []), Z = useCallback(() => {
-		let e = O.filter((e) => e.selected && e.type !== "group");
+		let e = A.filter((e) => e.selected && e.type !== "group");
 		if (e.length === 0) return;
-		let { nodes: t } = fromReactFlowNodes(O, Y.current), n = new Map(t.map((e) => [e.id, e])), r = /* @__PURE__ */ new Set();
+		let { nodes: t } = fromReactFlowNodes(A), n = new Map(t.map((e) => [e.id, e])), r = /* @__PURE__ */ new Set();
 		e.forEach((e) => {
-			e.parentId && r.add(e.parentId);
+			e.data._groupId && r.add(e.data._groupId);
 		});
 		let i = /* @__PURE__ */ new Map();
 		e.forEach((e) => {
@@ -1553,7 +1611,7 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 			position: e.position,
 			width: 200,
 			height: 100
-		}))), s = new Map(O.map((e) => [e.id, e])), c = getBounds(a.map((e) => {
+		}))), s = new Map(A.map((e) => [e.id, e])), c = getBounds(a.map((e) => {
 			let t = s.get(e.id);
 			return {
 				position: e.position,
@@ -1573,7 +1631,7 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 			width: l.width + 40,
 			height: l.height + 40
 		};
-		b && b(d), Y.current = [...Y.current.filter((e) => !r.has(e.id)), d], r.forEach((e) => {
+		b && b(d), r.forEach((e) => {
 			x && x(e);
 		});
 		let f = {
@@ -1583,45 +1641,57 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 			width: d.width,
 			height: d.height,
 			zIndex: -1,
-			data: {},
+			data: {
+				label: d.label,
+				_isGroup: !0
+			},
 			style: {
 				width: d.width,
 				height: d.height,
 				zIndex: -1
 			},
-			selected: !0,
-			draggable: !0
+			selected: !0
 		};
-		k((e) => [f, ...e.filter((e) => e.type !== "group" || !r.has(e.id)).map((e) => {
+		j((e) => [f, ...e.filter((e) => e.type !== "group" || !r.has(e.id)).map((e) => {
 			if (i.has(e.id)) {
+				D && D(e.id, {
+					...e.data,
+					_groupId: u
+				});
 				let t = n.get(e.id), r = t?.position.x ?? e.position.x, i = t?.position.y ?? e.position.y;
 				return {
 					...e,
 					parentId: u,
-					extent: "parent",
-					expandParent: !0,
-					draggable: !0,
+					expandParent: !1,
 					position: {
 						x: r - d.position.x,
 						y: i - d.position.y
 					},
-					selected: !1
+					selected: !1,
+					data: {
+						...e.data,
+						_groupId: u
+					}
 				};
 			}
 			return e;
-		})]), K(null);
+		})]), q(null);
 	}, [
-		O,
-		k,
+		A,
+		j,
 		b,
 		x,
 		D
 	]), Q = useCallback((e) => {
-		let t = e || G?.targetId || O.find((e) => e.selected && e.type === "group")?.id;
+		let t = e || K?.targetId || A.find((e) => e.selected && e.type === "group")?.id;
 		if (!t) return;
-		let { nodes: n } = fromReactFlowNodes(O, Y.current), r = new Map(n.map((e) => [e.id, e])), i = O.filter((e) => e.parentId === t).map((e) => e.id);
-		S && S(t, i), Y.current = Y.current.filter((e) => e.id !== t), k((e) => e.filter((e) => e.id !== t).map((e) => {
-			if (e.parentId === t) {
+		let { nodes: n } = fromReactFlowNodes(A), r = new Map(n.map((e) => [e.id, e])), i = A.filter((e) => e.data?._groupId === t || e.parentId === t).map((e) => e.id);
+		S && S(t, i), j((e) => e.filter((e) => e.id !== t).map((e) => {
+			if (e.data?._groupId === t || e.parentId === t) {
+				D && D(e.id, {
+					...e.data,
+					_groupId: void 0
+				});
 				let t = r.get(e.id), n = t?.position.x ?? e.position.x, i = t?.position.y ?? e.position.y;
 				return {
 					...e,
@@ -1629,76 +1699,88 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 					position: {
 						x: n,
 						y: i
+					},
+					data: {
+						...e.data,
+						_groupId: void 0
 					}
 				};
 			}
 			return e;
-		})), K(null);
+		})), q(null);
 	}, [
-		G,
-		O,
-		k,
+		K,
+		A,
+		j,
 		S,
 		D
 	]), $ = useCallback(() => {
-		let e = G?.type === "node" ? G.targetId : null;
-		if (!e && we && (e = we), e) {
-			let t = O.find((t) => t.id === e);
-			t && xe(t);
+		let e = K?.type === "node" ? K.targetId : null;
+		if (!e && Ee && (e = Ee), e) {
+			let t = A.find((t) => t.id === e);
+			t && Ce(t);
 		}
 	}, [
-		G,
-		O,
-		we
-	]), Ie = useCallback(() => {
-		if (q && R) {
+		K,
+		A,
+		Ee
+	]), Le = useCallback(() => {
+		if (J && z) {
 			let e;
-			e = G ? R.screenToFlowPosition({
-				x: G.position.x,
-				y: G.position.y
-			}) : R.screenToFlowPosition({
-				x: Se.x,
-				y: Se.y
+			e = K ? z.screenToFlowPosition({
+				x: K.position.x,
+				y: K.position.y
+			}) : z.screenToFlowPosition({
+				x: we.x,
+				y: we.y
 			});
 			let t = generateId(), n = {
-				...q,
+				...J,
 				id: t,
 				position: e,
 				selected: !0,
-				data: {}
+				data: {
+					...J.data,
+					_groupId: void 0
+				}
 			};
-			if (k((e) => e.map((e) => ({
+			if (j((e) => e.map((e) => ({
 				...e,
 				selected: !1
-			})).concat(n)), J(t), c) {
-				let [e] = fromReactFlowNodes([n], Y.current).nodes;
+			})).concat(n)), Y(t), c) {
+				let [e] = fromReactFlowNodes([n]).nodes;
 				c(e);
 			}
 		}
 	}, [
-		q,
-		R,
-		G,
-		Se,
-		k,
+		J,
+		z,
+		K,
+		we,
+		j,
 		c
-	]), Le = useCallback(() => {
+	]), Re = useCallback(() => {
 		let e, t = !1, n = !1;
-		if (G) e = G.targetId, t = G.type === "edge", n = G.type === "group";
+		if (K) e = K.targetId, t = K.type === "edge", n = K.type === "group";
 		else {
-			let r = O.find((e) => e.selected), i = j.find((e) => e.selected);
+			let r = A.find((e) => e.selected), i = N.find((e) => e.selected);
 			r ? (e = r.id, n = r.type === "group") : i && (e = i.id, t = !0);
 		}
-		e && (t ? (M((t) => t.filter((t) => t.id !== e)), v && v(e)) : n ? (k((t) => t.filter((t) => !(t.id === e || t.parentId === e))), M((t) => t.filter((t) => {
-			let n = O.find((n) => n.id === t.source && (n.id === e || n.parentId === e)), r = O.find((n) => n.id === t.target && (n.id === e || n.parentId === e));
-			return !n && !r;
-		})), x && x(e)) : (k((t) => t.filter((t) => t.id !== e)), M((t) => t.filter((t) => t.source !== e && t.target !== e)), h && h(e)), K(null));
+		if (e) {
+			if (t) R((t) => t.filter((t) => t.id !== e)), v && v(e);
+			else if (n) {
+				x && x(e);
+				let t = A.filter((t) => t.parentId === e || t.data?._groupId === e).map((e) => e.id);
+				j((n) => n.filter((n) => n.id !== e && !t.includes(n.id))), R((e) => e.filter((e) => !t.includes(e.source) && !t.includes(e.target)));
+			} else j((t) => t.filter((t) => t.id !== e)), R((t) => t.filter((t) => t.source !== e && t.target !== e)), h && h(e);
+			q(null);
+		}
 	}, [
-		G,
-		O,
+		K,
+		A,
+		N,
 		j,
-		k,
-		M,
+		R,
 		h,
 		v,
 		x
@@ -1707,127 +1789,135 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 		let e = (e) => {
 			if (n) return;
 			let t = document.activeElement;
-			t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.getAttribute("contenteditable") === "true") || ((e.ctrlKey || e.metaKey) && e.key === "c" ? $() : (e.ctrlKey || e.metaKey) && e.key === "v" ? Ie() : (e.ctrlKey || e.metaKey) && e.key === "g" && (e.preventDefault(), Z()));
+			t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.getAttribute("contenteditable") === "true") || ((e.ctrlKey || e.metaKey) && e.key === "c" ? $() : (e.ctrlKey || e.metaKey) && e.key === "v" ? Le() : (e.ctrlKey || e.metaKey) && e.key === "g" && (e.preventDefault(), Z()));
 		};
 		return window.addEventListener("keydown", e), () => window.removeEventListener("keydown", e);
 	}, [
 		$,
-		Ie,
+		Le,
 		Z,
 		n
 	]);
-	let Re = useMemo(() => {
-		let e = [], t = G?.type === "edge";
-		return G?.type === "multi" && e.push({
+	let ze = useMemo(() => {
+		let e = [], t = K?.type === "edge";
+		if (K?.type === "multi" && e.push({
 			label: "创建分组 (Group)",
 			onClick: Z,
 			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FolderInput, { size: 16 }),
 			shortcut: "Ctrl+G"
-		}), (G?.type === "node" || G?.type === "edge") && e.push({
+		}), (K?.type === "node" || K?.type === "edge") && e.push({
 			label: "复制 (Copy)",
 			onClick: $,
-			disabled: G.type !== "node",
+			disabled: K.type !== "node",
 			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { size: 16 }),
 			shortcut: "Ctrl+C"
-		}), (G?.type === "pane" || G?.type === "node") && e.push({
+		}), (K?.type === "pane" || K?.type === "node") && e.push({
 			label: "粘贴 (Paste)",
-			onClick: Ie,
-			disabled: !q || t,
+			onClick: Le,
+			disabled: !J || t,
 			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Clipboard, { size: 16 }),
 			shortcut: "Ctrl+V"
 		}), e.push({
 			label: "删除 (Delete)",
-			onClick: Le,
+			onClick: Re,
 			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { size: 16 }),
 			shortcut: "Del"
-		}), G?.type === "group" && e.push({
+		}), K?.type === "group" && e.push({
 			label: "解散分组 (Ungroup)",
-			onClick: () => Q(G.targetId),
+			onClick: Q,
 			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Group, { size: 16 })
-		}), e;
+		}), K?.type === "node" && K.targetId && O && A.find((e) => e.id === K.targetId)) {
+			let { nodes: t } = fromReactFlowNodes(A), n = t.find((e) => e.id === K.targetId);
+			if (n) {
+				let t = k(K.targetId), r = O(K.targetId, n, t);
+				r.length > 0 && r.forEach((t) => {
+					e.push({
+						label: t.label,
+						onClick: t.onClick,
+						disabled: t.disabled,
+						icon: t.icon
+					});
+				});
+			}
+		}
+		return e;
 	}, [
-		G,
-		q,
+		K,
+		J,
 		$,
-		Ie,
 		Le,
+		Re,
 		Z,
-		Q
+		Q,
+		A,
+		O,
+		k
 	]);
 	return React.useImperativeHandle(T, () => ({
-		fitView: () => R?.fitView(),
-		getViewport: () => R?.getViewport(),
+		fitView: () => z?.fitView(),
+		getViewport: () => z?.getViewport(),
 		setFlow: (e) => {
-			Te.current = !0, k(toReactFlowNodes(e.nodes, e.groups)), M(toReactFlowEdges(e.edges)), Y.current = e.groups || [];
-		},
-		getFlow: () => {
-			let { nodes: e, groups: t } = fromReactFlowNodes(O, Y.current);
-			return {
-				nodes: e,
-				edges: fromReactFlowEdges(j),
-				groups: t
-			};
+			j(toReactFlowNodes(e.nodes, e.groups)), R(toReactFlowEdges(e.edges));
 		},
 		ungroup: (e) => Q(e)
 	}), [
+		z,
+		j,
 		R,
-		k,
-		M,
-		Q,
-		O,
-		j
+		Q
 	]), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: `canvas-flow-wrapper ${me ? "is-connecting" : ""}`,
+		className: `canvas-flow-wrapper ${B ? "is-connecting" : ""}`,
 		style: { backgroundColor: E.style?.background },
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ReactFlow, {
-				nodes: O,
-				edges: j,
-				onNodesChange: Oe,
-				onEdgesChange: ke,
-				onConnect: V,
-				onConnectStart: H,
-				onConnectEnd: U,
-				onNodeDragStop: je,
-				isValidConnection: B,
-				onPaneClick: Me,
-				onNodeContextMenu: Ne,
-				onPaneContextMenu: Pe,
-				onEdgeContextMenu: Fe,
-				onInit: pe,
-				nodeTypes: De,
-				onSelectionChange: Ae,
+				nodes: A,
+				edges: N,
+				onNodesChange: ke,
+				onEdgesChange: Ae,
+				onConnect: U,
+				onConnectStart: W,
+				onConnectEnd: ge,
+				onNodeDragStop: Me,
+				isValidConnection: H,
+				onPaneClick: Ne,
+				onNodeContextMenu: Pe,
+				onPaneContextMenu: Fe,
+				onEdgeContextMenu: Ie,
+				onInit: me,
+				nodeTypes: Oe,
+				onSelectionChange: je,
 				fitView: !0,
 				nodesDraggable: !n,
 				nodesConnectable: !n,
 				deleteKeyCode: ["Backspace", "Delete"],
 				selectionKeyCode: ["Shift"],
+				noPanClassName: "nopan",
 				children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Background, {}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectionMenu, {
-						selectedNodes: O.filter((e) => e.selected && e.type !== "group"),
+						selectedNodes: A.filter((e) => e.selected && e.type !== "group"),
 						onCreateGroup: Z
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Controls, {}),
-					O.length === 0 && o && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					A.length === 0 && o && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "cf-empty-state-overlay",
 						children: o
 					})
 				]
 			}),
-			z.isOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FloatingNodeMenu, {
-				position: z.position,
-				onAddNode: W,
-				availableTypes: _e,
-				onClose: () => he((e) => ({
+			he.isOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FloatingNodeMenu, {
+				position: he.position,
+				onAddNode: _e,
+				availableTypes: ve,
+				onClose: () => V((e) => ({
 					...e,
 					isOpen: !1
 				}))
 			}),
-			G?.isOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ContextMenu, {
-				items: Re,
-				position: G.position,
-				onClose: () => K(null)
+			K?.isOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ContextMenu, {
+				items: ze,
+				position: K.position,
+				onClose: () => q(null)
 			})
 		]
 	});
@@ -1926,7 +2016,7 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 		})]
 	});
 }, TextNode = ({ data: e, isConnected: t, onChange: n }) => {
-	let [r, i] = useState(!1), a = t || e.isInteracted, o = [
+	let [r, i] = useState(!1), a = t || e.isInteracted || !!e.text, o = [
 		{
 			id: "edit",
 			icon: PenLine,
@@ -2162,19 +2252,40 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 	}, c = () => {
 		let t = e.src || e.output;
 		if (!t) return null;
-		let n = e.fileType || "", r = n.startsWith("image/"), i = n.startsWith("video/");
-		return r || !n ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+		let n = e.fileType || "", r = ((e) => {
+			let t = e.split("?")[0].split(".").pop()?.toLowerCase();
+			return [
+				"jpg",
+				"jpeg",
+				"png",
+				"gif",
+				"webp",
+				"svg",
+				"bmp"
+			].includes(t || "") ? "image" : [
+				"mp4",
+				"webm",
+				"mov",
+				"avi",
+				"mkv",
+				"m4v"
+			].includes(t || "") ? "video" : "unknown";
+		})(t), i = n.startsWith("video/") || r === "video", a = n.startsWith("image/") || r === "image";
+		return i ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("video", {
+			src: t,
+			className: "cf-upload-preview-video",
+			controls: !0
+		}) : a ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
 			src: t,
 			alt: "uploaded",
 			className: "cf-upload-preview-image",
 			onError: (e) => {
 				console.error("Image load failed:", t);
 			}
-		}) : i ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("video", {
-			src: t,
-			className: "cf-upload-preview-video",
-			controls: !0
-		}) : null;
+		}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "cf-upload-preview-file",
+			children: e.fileName || "未知文件"
+		});
 	}, l = e.src || e.output;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: `cf-upload-container ${l ? "has-content" : ""}`,
@@ -2240,7 +2351,26 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 			})
 		]
 	});
-}, createDefaultNodeData = (e) => {
+}, ActionToolbar = ({ actions: t, className: n = "", style: r, visible: i = !0 }) => !i || t.length === 0 ? null : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	className: `canvas-node-toolbar ${n}`,
+	style: r,
+	onMouseDown: (e) => e.stopPropagation(),
+	children: t.map((t) => {
+		let n = t.icon;
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+			className: `canvas-node-toolbar-item ${t.className || ""}`,
+			onClick: t.onClick,
+			title: t.title || t.label,
+			children: [t.icon && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+				className: "toolbar-item-icon",
+				children: React.isValidElement(t.icon) ? t.icon : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(n, { size: 14 })
+			}), t.label && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+				className: "toolbar-item-label",
+				children: t.label
+			})]
+		}, t.id);
+	})
+}), createDefaultNodeData = (e) => {
 	switch (e) {
 		case StandardNodeType.TEXT: return {
 			text: "",
@@ -2316,18 +2446,19 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 	let { initialFlow: n = {
 		nodes: [],
 		edges: []
-	}, config: r = defaultCanvasConfig, components: i = defaultComponentRegistry, execution: o = {}, mode: s = "edit", ui: l = { showToolbar: !0 }, renderEmpty: f, renderNodeInspector: p, onChange: m, onSave: h, onRunFlow: g, onNodeRun: _, onGroupRun: v, onGroupSave: y, onSelectionChange: b, onNodeAdd: x, onNodeDelete: fe, onNodeMove: S, onNodeDataChange: C, onEdgeAdd: w, onEdgeDelete: T, onGroupAdd: E, onGroupDelete: D, onGroupUngroup: O, onGroupUpdate: k, className: A, style: j } = e, [M, N] = useState(n), [P, F] = useState(!1), [I, L] = useState(null), [R, pe] = useState(null), me = useRef(new FlowRunner(o)), z = useRef(null), he = useRef(""), B = useRef(/* @__PURE__ */ new Map()), V = useRef(new NodeMediaEmitter()), H = useCallback((e) => {
-		let t = z.current?.getFlow?.();
-		return t && t.nodes.find((t) => t.id === e) || null;
-	}, []), U = useCallback((e, t, n) => {
-		let r = H(e);
+	}, config: r = defaultCanvasConfig, components: i = defaultComponentRegistry, execution: o = {}, mode: s = "edit", ui: l = { showToolbar: !0 }, renderEmpty: f, renderNodeInspector: p, onChange: m, onSave: h, onRunFlow: g, onNodeRun: _, onGroupRun: v, onGroupSave: y, onSelectionChange: b, onNodeAdd: x, onNodeDelete: fe, onNodeMove: S, onNodeDataChange: C, onEdgeAdd: w, onEdgeDelete: T, onGroupAdd: E, onGroupDelete: D, onGroupUngroup: O, onGroupUpdate: k, getNodeContextMenuItems: A, className: j, style: M } = e, [N, P] = useState(n), [F, I] = useState(!1), [L, R] = useState(null), [pe, z] = useState(null), me = useRef(new FlowRunner(o)), B = useRef(null), he = useRef(""), V = useRef(/* @__PURE__ */ new Map()), H = useRef(new NodeMediaEmitter()), U = useCallback((e) => {
+		let t = B.current?.getFlow?.() || N;
+		return !t || !t.nodes ? null : t.nodes.find((t) => t.id === e) || null;
+	}, [N]), W = useCallback((e, t, n) => {
+		let r = U(e);
 		if (!r) return console.warn(`[${n}] 节点不存在: ${e}`), null;
 		let i = Array.isArray(t) ? t : [t];
 		return i.includes(r.type) ? r : (console.error(`[${n}] 节点 ${e} 的类型是 "${r.type}"，不符合要求。`, `期望的类型: ${i.join(", ")}`), null);
-	}, [H]), W = useCallback((e, t) => {
+	}, [U]), G = useCallback((e, t) => {
 		let n = [
 			"src",
 			"text",
+			"title",
 			"outputData",
 			"output",
 			"_loading",
@@ -2340,45 +2471,45 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 			"_uploading",
 			"_uploadError",
 			"resourceType"
-		], r = B.current.get(e) || {}, i = { ...r };
+		], r = V.current.get(e) || {}, i = { ...r };
 		console.log(`[Core updateMediaData] 节点 ${e}:`, {
 			currentMedia: r,
 			updates: t,
 			willMerge: i
 		}), Object.keys(t).forEach((r) => {
 			n.includes(r) ? t[r] === void 0 ? delete i[r] : i[r] = t[r] : console.warn(`[updateMediaData] 忽略非媒体字段 "${r}" (节点 ${e})`, `\n允许的字段: ${n.join(", ")}`);
-		}), B.current.set(e, i), V.current.emit(e, i), console.log("[Core updateMediaData] 更新后:", i);
+		}), V.current.set(e, i), H.current.emit(e, i), console.log("[Core updateMediaData] 更新后:", i);
 	}, []);
 	useImperativeHandle(t, () => ({
 		init: (e, t) => {
 			let n = t || generateId();
-			return he.current = n, e && (N(e), z.current?.setFlow && (z.current.setFlow(e), setTimeout(() => {
-				z.current?.fitView();
+			return he.current = n, e && (P(e), B.current?.setFlow && (B.current.setFlow(e), setTimeout(() => {
+				B.current?.fitView();
 			}, 10))), n;
 		},
-		getFlow: () => z.current?.getFlow?.() || M,
+		getFlow: () => B.current?.getFlow?.() || N,
 		setFlow: (e) => {
-			N(e), z.current?.setFlow && z.current.setFlow(e);
+			P(e), B.current?.setFlow && B.current.setFlow(e);
 		},
-		runFlow: async () => G(),
+		runFlow: async () => ve(),
 		fitView: () => {
-			z.current?.fitView();
+			B.current?.fitView();
 		},
-		getViewport: () => z.current?.getViewport() || {
+		getViewport: () => B.current?.getViewport() || {
 			x: 0,
 			y: 0,
 			zoom: 1
 		},
 		getNode: (e) => {
-			let t = z.current?.getFlow?.();
-			return t && t.nodes.find((t) => t.id === e) || null;
+			let t = B.current?.getFlow?.() || N;
+			return !t || !t.nodes ? null : t.nodes.find((t) => t.id === e) || null;
 		},
 		getUpstreamNodes: (e) => {
-			let t = z.current?.getFlow?.();
+			let t = B.current?.getFlow?.();
 			if (!t) return [];
 			let n = t.edges.filter((t) => t.target === e).map((e) => e.source);
 			return t.nodes.filter((e) => n.includes(e.id)).map((e) => {
-				let t = r.nodeDefinitions.find((t) => t.type === e.type), n = B.current.get(e.id) || {};
+				let t = r.nodeDefinitions.find((t) => t.type === e.type), n = V.current.get(e.id) || {};
 				return {
 					id: e.id,
 					type: e.type,
@@ -2389,48 +2520,51 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 			});
 		},
 		setNodeImage: (e, t) => {
-			U(e, [
+			W(e, [
 				"image",
 				"video",
 				"audio",
 				"user-upload"
-			], "setNodeImage") && W(e, { src: t });
+			], "setNodeImage") && G(e, { src: t });
 		},
 		setNodeVideo: (e, t) => {
-			U(e, "video", "setNodeVideo") && W(e, { src: t });
+			W(e, "video", "setNodeVideo") && G(e, { src: t });
 		},
 		setNodeAudio: (e, t) => {
-			U(e, "audio", "setNodeAudio") && W(e, { src: t });
+			W(e, "audio", "setNodeAudio") && G(e, { src: t });
 		},
 		setNodeText: (e, t) => {
-			U(e, "text", "setNodeText") && W(e, { text: t });
+			W(e, "text", "setNodeText") && G(e, { text: t });
+		},
+		setNodeTitle: (e, t) => {
+			U(e) ? G(e, { title: t }) : console.warn(`[setNodeTitle] 节点不存在: ${e}`);
 		},
 		setNodeOutput: (e, t) => {
-			H(e) ? W(e, { outputData: t }) : console.warn(`[setNodeOutput] 节点不存在: ${e}`);
+			U(e) ? G(e, { outputData: t }) : console.warn(`[setNodeOutput] 节点不存在: ${e}`);
 		},
 		setUploadNodeSrc: (e, t, n) => {
-			if (!U(e, "user-upload", "setUploadNodeSrc")) return;
+			if (!W(e, "user-upload", "setUploadNodeSrc")) return;
 			let r = {
 				src: t,
 				_uploading: !1,
 				_uploadError: null
 			};
-			n && (n.fileName && (r.fileName = n.fileName), n.fileType && (r.fileType = n.fileType), n.fileSize && (r.fileSize = n.fileSize)), W(e, r), console.log(`[setUploadNodeSrc] 设置上传节点 ${e} 的媒体源:`, t);
+			n && (n.fileName && (r.fileName = n.fileName), n.fileType && (r.fileType = n.fileType), n.fileSize && (r.fileSize = n.fileSize)), G(e, r), console.log(`[setUploadNodeSrc] 设置上传节点 ${e} 的媒体源:`, t);
 		},
 		setUploadNodeLoading: (e, t) => {
-			U(e, "user-upload", "setUploadNodeLoading") && (W(e, {
+			W(e, "user-upload", "setUploadNodeLoading") && (G(e, {
 				_uploading: t,
 				_uploadError: t ? null : void 0
 			}), console.log(`[setUploadNodeLoading] 设置上传节点 ${e} 加载状态:`, t));
 		},
 		setUploadNodeError: (e, t) => {
-			U(e, "user-upload", "setUploadNodeError") && (W(e, {
+			W(e, "user-upload", "setUploadNodeError") && (G(e, {
 				_uploadError: t,
 				_uploading: !1
 			}), console.log(`[setUploadNodeError] 设置上传节点 ${e} 错误:`, t));
 		},
 		clearUploadNode: (e) => {
-			U(e, "user-upload", "clearUploadNode") && (W(e, {
+			W(e, "user-upload", "clearUploadNode") && (G(e, {
 				src: void 0,
 				fileName: void 0,
 				fileType: void 0,
@@ -2441,122 +2575,128 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 			}), console.log(`[clearUploadNode] 清空上传节点 ${e}`));
 		},
 		setNodeContent: (e, t) => {
-			W(e, t);
+			G(e, t);
 		},
 		clearNodeContent: (e) => {
-			let { src: t, text: n, outputData: r, ...i } = B.current.get(e) || {};
-			B.current.set(e, i), V.current.emit(e, i);
+			let { src: t, text: n, outputData: r, ...i } = V.current.get(e) || {};
+			V.current.set(e, i), H.current.emit(e, i);
 		},
 		setNodeLoading: (e) => {
-			let t = B.current.get(e) || {};
-			B.current.set(e, {
+			let t = V.current.get(e) || {};
+			V.current.set(e, {
 				...t,
 				_loading: !0
-			}), V.current.emit(e, B.current.get(e));
+			}), H.current.emit(e, V.current.get(e));
 		},
 		clearNodeLoading: (e) => {
-			let t = B.current.get(e) || {};
+			let t = V.current.get(e) || {};
 			console.log(`[Core clearNodeLoading] 节点 ${e} 清除前:`, t);
 			let n = { ...t };
-			delete n._loading, B.current.set(e, n), V.current.emit(e, n), console.log(`[Core clearNodeLoading] 节点 ${e} 清除后:`, n);
+			delete n._loading, V.current.set(e, n), H.current.emit(e, n), console.log(`[Core clearNodeLoading] 节点 ${e} 清除后:`, n);
 		},
 		setNodeError: (e, t) => {
-			let n = B.current.get(e) || {};
-			B.current.set(e, {
+			let n = V.current.get(e) || {};
+			V.current.set(e, {
 				...n,
 				_error: t
-			}), V.current.emit(e, B.current.get(e));
+			}), H.current.emit(e, V.current.get(e));
 		},
 		clearNodeError: (e) => {
-			let t = { ...B.current.get(e) || {} };
-			delete t._error, B.current.set(e, t), V.current.emit(e, t);
+			let t = { ...V.current.get(e) || {} };
+			delete t._error, V.current.set(e, t), H.current.emit(e, t);
 		},
 		updateNodeMedia: (e, t) => {
 			let n = {
-				...B.current.get(e) || {},
+				...V.current.get(e) || {},
 				...t
 			};
 			Object.keys(n).forEach((e) => {
 				n[e] === void 0 && delete n[e];
-			}), B.current.set(e, n), V.current.emit(e, n);
+			}), V.current.set(e, n), H.current.emit(e, n);
 		},
 		batchUpdateNodeMedia: (e) => {
 			e.forEach(({ nodeId: e, data: t }) => {
 				let n = {
-					...B.current.get(e) || {},
+					...V.current.get(e) || {},
 					...t
 				};
-				B.current.set(e, n);
-			}), V.current.batchEmit(e.map((e) => ({
+				V.current.set(e, n);
+			}), H.current.batchEmit(e.map((e) => ({
 				nodeId: e.nodeId,
-				data: B.current.get(e.nodeId)
+				data: V.current.get(e.nodeId)
 			})));
 		},
-		getNodeMedia: (e) => B.current.get(e) || {},
+		getNodeMedia: (e) => V.current.get(e) || {},
 		updateNodeStatus: (e, t) => {
 			let n = {
-				...B.current.get(e) || {},
+				...V.current.get(e) || {},
 				_executionStatus: t
 			};
-			B.current.set(e, n), V.current.emit(e, n);
+			V.current.set(e, n), H.current.emit(e, n);
 		}
-	}));
+	}), [
+		N,
+		r,
+		U,
+		W,
+		G
+	]);
 	let ge = useCallback((e) => {
-		N(e), m?.(e);
+		P(e), m?.(e);
 	}, [m]), _e = useCallback((e) => {
-		e.length === 1 ? pe(e[0]) : pe(null), b?.(e);
-	}, [b]), G = async () => {
-		if (!P) {
-			F(!0), g?.(M);
+		e.length === 1 ? z(e[0]) : z(null), b?.(e);
+	}, [b]), ve = async () => {
+		if (!F) {
+			I(!0), g?.(N);
 			try {
-				return await me.current.runFlow(M, (e, t) => {});
+				return await me.current.runFlow(N, (e, t) => {});
 			} catch (e) {
 				console.error("Flow execution failed", e);
 			} finally {
-				F(!1);
+				I(!1);
 			}
 		}
 	}, K = async (e) => {
-		if (P) return;
+		if (F) return;
 		if (v) {
-			F(!0);
+			I(!0);
 			try {
 				await v(e);
 			} catch (t) {
 				console.error(`Group ${e} execution failed`, t);
 			} finally {
-				F(!1);
+				I(!1);
 			}
 			return;
 		}
-		let t = M.nodes.filter((t) => t.groupId === e);
+		let t = N.nodes.filter((t) => t.groupId === e);
 		if (t.length === 0) return;
 		let n = new Set(t.map((e) => e.id)), r = {
 			nodes: t,
-			edges: M.edges.filter((e) => n.has(e.source) && n.has(e.target)),
+			edges: N.edges.filter((e) => n.has(e.source) && n.has(e.target)),
 			groups: [],
-			meta: M.meta
+			meta: N.meta
 		};
-		F(!0);
+		I(!0);
 		try {
 			await me.current.runFlow(r, (e, t) => {});
 		} catch (t) {
 			console.error(`Group ${e} execution failed`, t);
 		} finally {
-			F(!1);
+			I(!1);
 		}
-	}, q = async (e) => {
-		if (!I) {
-			L(e);
+	}, ye = async (e) => {
+		if (!L) {
+			R(e);
 			try {
 				_ ? await _(e) : console.warn("No onNodeRun handler provided");
 			} catch (e) {
 				console.error("Node execution failed:", e);
 			} finally {
-				L(null);
+				R(null);
 			}
 		}
-	}, ve = useCallback((e, t) => {
+	}, be = useCallback((e, t) => {
 		switch (e) {
 			case "create":
 				E?.(t);
@@ -2569,22 +2709,22 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 				k?.(t);
 				break;
 			case "ungroup":
-				z.current?.ungroup && z.current.ungroup(t.id);
+				B.current?.ungroup && B.current.ungroup(t.id);
 				break;
 			case "run":
 				K(t.id);
 				break;
 			case "save":
-				let e = M.groups?.find((e) => e.id === t.id);
+				let e = N.groups?.find((e) => e.id === t.id);
 				if (!e) {
 					console.warn(`Group ${t.id} not found for save`);
 					return;
 				}
-				let n = M.nodes.filter((e) => e.groupId === t.id), r = new Set(n.map((e) => e.id)), i = {
+				let n = N.nodes.filter((e) => e.groupId === t.id), r = new Set(n.map((e) => e.id)), i = {
 					nodes: n,
-					edges: M.edges.filter((e) => r.has(e.source) && r.has(e.target)),
+					edges: N.edges.filter((e) => r.has(e.source) && r.has(e.target)),
 					groups: [e],
-					meta: M.meta
+					meta: N.meta
 				};
 				y?.(t.id, i);
 				break;
@@ -2593,11 +2733,11 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 		E,
 		D,
 		k,
-		M,
+		N,
 		v,
 		y
-	]), ye = useCallback((e) => B.current.get(e) || {}, []), be = useCallback((e, t) => {
-		let n = B.current.get(e) || {};
+	]), xe = useCallback((e) => V.current.get(e) || {}, []), Se = useCallback((e, t) => {
+		let n = V.current.get(e) || {};
 		console.log(`[Core updateNodeMedia] 节点 ${e}:`, {
 			currentMedia: n,
 			newMedia: t,
@@ -2612,34 +2752,35 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 		};
 		Object.keys(r).forEach((e) => {
 			r[e] === void 0 && delete r[e];
-		}), B.current.set(e, r), V.current.emit(e, r), console.log("[Core updateNodeMedia] 更新后的 mediaMap:", r);
+		}), V.current.set(e, r), H.current.emit(e, r), console.log("[Core updateNodeMedia] 更新后的 mediaMap:", r);
 	}, []);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CanvasProvider, {
 		config: r,
 		components: i,
 		readOnly: s === "view",
-		onNodeRun: q,
+		onNodeRun: ye,
 		onNodeDataChange: C,
-		runningNodeId: I,
-		isExecuting: P || !!I,
-		onGroupAction: ve,
-		inspectingNodeId: R,
-		mediaMap: B.current,
-		mediaEmitter: V.current,
-		getNodeMedia: ye,
-		updateNodeMedia: be,
+		runningNodeId: L,
+		isExecuting: F || !!L,
+		onGroupAction: be,
+		inspectingNodeId: pe,
+		mediaMap: V.current,
+		mediaEmitter: H.current,
+		getNodeMedia: xe,
+		updateNodeMedia: Se,
 		renderNodeInspector: p,
+		getNodeContextMenuItems: A,
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: `canvas-flow-container ${A || ""}`,
+			className: `canvas-flow-container ${j || ""}`,
 			style: {
 				width: "100%",
 				height: "100%",
 				position: "relative",
 				overflow: "hidden",
-				...j
+				...M
 			},
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CanvasEditor, {
-				ref: z,
+				ref: B,
 				initialFlow: n,
 				readOnly: s === "view",
 				renderEmpty: f,
@@ -2673,4 +2814,4 @@ const CanvasEmptyState = ({ onAction: e }) => /* @__PURE__ */ (0, import_jsx_run
 		})]
 	})
 });
-export { ActionToolbar, AudioNode, CanvasEmptyState, CanvasFlow, FloatingNodeMenu, GroupNode, ImageNode, NodeEmptyState, NodeMediaEmitter, StandardNodeType, TextNode, UploadNode, VideoNode, defaultCanvasConfig, defaultComponentRegistry };
+export { ActionToolbar, AudioNode, CanvasEmptyState, CanvasFlow, FloatingNodeMenu, GroupNode, ImageNode, NodeEmptyState, NodeMediaEmitter, NodeTitleEditor, StandardNodeType, TextNode, UploadNode, VideoNode, defaultCanvasConfig, defaultComponentRegistry };

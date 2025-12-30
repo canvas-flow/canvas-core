@@ -2,7 +2,7 @@ import React, { memo, useState, useCallback, useMemo } from 'react';
 import { NodeProps, NodeResizer, useReactFlow, useViewport } from '@xyflow/react';
 import { Play, Ungroup, Save } from 'lucide-react';
 import { useCanvasContext } from '../../core/CanvasContext';
-import { ActionToolbar, ToolbarAction } from './ActionToolbar';
+import type { ToolbarAction } from './ActionToolbar';
 
 export const GroupNode = memo(({ id, data, selected }: NodeProps) => {
   const { setNodes } = useReactFlow();
@@ -109,65 +109,115 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps) => {
         onResizeEnd={handleResizeEnd}
       />
       
-      {/* Header / Title Bar - 使用反向缩放使标题固定大小 */}
+      {/* 编组标题 - 左上角位置，使用反向缩放使标题固定大小 */}
+      {isEditing ? (
+        <input
+          autoFocus
+          value={labelInput}
+          onChange={(e) => setLabelInput(e.target.value)}
+          onBlur={handleRename}
+          onKeyDown={(e) => e.key === 'Enter' && handleRename()}
+          onMouseDown={(e) => e.stopPropagation()}
+          className="canvas-node-title-input"
+          style={{ 
+            position: 'absolute',
+            top: -24 * inverseScale,
+            left: 0,
+            transform: `scale(${inverseScale})`,
+            transformOrigin: 'left top',
+          }}
+        />
+      ) : (
+        <div 
+          className="canvas-node-title"
+          style={{
+            position: 'absolute',
+            top: -24 * inverseScale,
+            left: 0,
+            transform: `scale(${inverseScale})`,
+            transformOrigin: 'left top',
+          }}
+          onDoubleClick={() => setIsEditing(true)}
+        >
+          {data.label as string}
+        </div>
+      )}
+
+      {/* 编组工具栏 - 放在编组正上方中央，使用反向缩放和胶囊按钮组样式 */}
       <div 
         style={{
           position: 'absolute',
-          top: -34 * inverseScale,
-          left: 0,
-          height: 30,
+          top: -56 * inverseScale,
+          left: '50%',
+          transform: `translateX(-50%) scale(${inverseScale})`,
+          transformOrigin: 'center top',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'flex-start',
-          gap: 8,
-          pointerEvents: 'none', // Let clicks pass through to underlying area unless hitting buttons
-          transform: `scale(${inverseScale})`,
-          transformOrigin: 'left top',
+          justifyContent: 'center',
+          pointerEvents: 'none',
+          opacity: selected ? 1 : 0,
+          transition: 'opacity 0.2s',
         }}
       >
-        {/* Label */}
-        <div 
-            style={{
-                padding: '4px 8px',
-                backgroundColor: 'rgba(0,0,0,0.5)',
-                borderRadius: 4,
-                color: '#ccc',
-                fontSize: 12,
-                cursor: 'text',
-                fontWeight: 500,
-                pointerEvents: 'auto',
-                display: 'flex',
-                alignItems: 'center',
-                maxWidth: '60%',
-            }}
-            onDoubleClick={() => setIsEditing(true)}
+        {/* 工具栏容器 - 胶囊样式 */}
+        <div
+          className="group-toolbar-capsule"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: '#1e1e1e',
+            borderRadius: 20,
+            padding: '6px 8px',
+            gap: 2,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+            border: '1px solid #333',
+            pointerEvents: selected ? 'auto' : 'none',
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
         >
-            {isEditing ? (
-                <input
-                autoFocus
-                value={labelInput}
-                onChange={(e) => setLabelInput(e.target.value)}
-                onBlur={handleRename}
-                onKeyDown={(e) => e.key === 'Enter' && handleRename()}
-                onMouseDown={(e) => e.stopPropagation()}
-                style={{ background: 'transparent', border: 'none', color: 'inherit', outline: 'none', width: '100%', minWidth: 50 }}
-                />
-            ) : (
-            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.label as string}</span>
-            )}
+          {/* 工具按钮组 */}
+          {actions.map((action) => {
+            const Icon = action.icon as any;
+            const isGreen = action.className?.includes('text-green');
+            return (
+              <button
+                key={action.id}
+                onClick={action.onClick}
+                title={action.title || action.label}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  padding: '6px 12px',
+                  borderRadius: 14,
+                  cursor: 'pointer',
+                  color: isGreen ? '#4ade80' : '#ccc',
+                  fontSize: 13,
+                  fontWeight: 500,
+                  border: 'none',
+                  background: 'transparent',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.15s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = isGreen ? 'rgba(74, 222, 128, 0.15)' : '#2a2a2a';
+                  e.currentTarget.style.color = isGreen ? '#4ade80' : '#fff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = isGreen ? '#4ade80' : '#ccc';
+                }}
+              >
+                {action.icon && (
+                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                    {React.isValidElement(action.icon) ? action.icon : <Icon size={14} />}
+                  </span>
+                )}
+                {action.label && <span>{action.label}</span>}
+              </button>
+            );
+          })}
         </div>
-
-        {/* Action Buttons */}
-        <ActionToolbar 
-            actions={actions}
-            visible={true}
-            style={{ 
-                marginLeft: 'auto',
-                opacity: selected ? 1 : 0,
-                transition: 'opacity 0.2s',
-                pointerEvents: selected ? 'auto' : 'none'
-            }}
-        />
       </div>
     </div>
   );
