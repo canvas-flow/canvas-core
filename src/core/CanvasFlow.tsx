@@ -70,6 +70,8 @@ export interface CanvasFlowProps {
   
   // Granular Event Hooks (Callbacks)
   onNodeAdd?: (node: CanvasFlowNode) => void;
+  /** Callback when node is copied, use to copy params */
+  onNodeCopy?: (sourceNodeId: string, newNodeId: string) => void;
   onNodeDelete?: (nodeId: string) => void;
   onNodeMove?: (node: CanvasFlowNode) => void;
   onNodeDataChange?: (nodeId: string, data: any) => void;
@@ -156,6 +158,7 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
     
     // Granular events
     onNodeAdd,
+    onNodeCopy,
     onNodeDelete,
     onNodeMove,
     onNodeDataChange,
@@ -779,6 +782,7 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
           onSelectionChange={handleSelectionChange} 
           
           onNodeAdd={onNodeAdd}
+          onNodeCopy={onNodeCopy}
           onNodeMove={onNodeMove}
           onNodeDelete={onNodeDelete}
           onNodeDataChange={onNodeDataChange}

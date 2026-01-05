@@ -157,8 +157,15 @@ export const UniversalNode = memo((props: NodeProps) => {
     style: style, // Pass style to content component
   };
 
+  // 构建节点类名
+  const nodeClassName = [
+    'canvas-node',
+    selected ? 'selected' : '',
+    nodeMedia._error ? 'error' : '',
+  ].filter(Boolean).join(' ');
+
   return (
-    <div className={`canvas-node ${selected ? 'selected' : ''}`} style={{width: '100%', height: '100%'}}>
+    <div className={nodeClassName} style={{width: '100%', height: '100%'}}>
       {/* Node Toolbar / Inspector (Render Props pattern) */}
       {renderNodeInspector && (
         <NodeToolbar isVisible={id === inspectingNodeId && !readOnly} position={Position.Bottom}>
@@ -193,8 +200,6 @@ export const UniversalNode = memo((props: NodeProps) => {
         )}
 
         {/* GLOBAL LOADING OVERLAY */}
-        {/* ✅ 修改：移除 src/output 检查，即使节点已有输出也显示 loading
-            这样重新执行已有结果的节点时，用户可以看到 loading 状态 */}
         {(nodeMedia._loading || nodeMedia._executionStatus === 'running') && (
             <div className="cf-upload-loading-overlay" style={{
                 position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
@@ -207,20 +212,15 @@ export const UniversalNode = memo((props: NodeProps) => {
                 <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
             </div>
         )}
-
-        {/* GLOBAL ERROR OVERLAY */}
-        {nodeMedia._error && (
-            <div className="cf-node-error-overlay" style={{
-                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                background: 'rgba(220, 38, 38, 0.9)',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                zIndex: 20, color: '#fff', gap: 8, borderRadius: 'inherit', padding: 12
-            }}>
-                <span style={{fontSize: 14, fontWeight: 600}}>⚠️ Error</span>
-                <span style={{fontSize: 12, textAlign: 'center', wordBreak: 'break-word'}}>{nodeMedia._error}</span>
-            </div>
-        )}
       </div>
+
+      {/* Error Bar - 底部错误信息条 */}
+      {nodeMedia._error && (
+        <div className="cf-node-error-bar">
+          <span className="cf-node-error-icon">⚠️</span>
+          <span className="cf-node-error-text">{nodeMedia._error}</span>
+        </div>
+      )}
       
       <Handle type="source" position={Position.Right} className="canvas-handle" />
     </div>

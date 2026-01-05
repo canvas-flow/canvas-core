@@ -53,6 +53,17 @@
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
+/* 错误状态 - 红色边框 */
+.canvas-node.error {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.3), 0 4px 10px rgba(220, 38, 38, 0.2);
+}
+
+.canvas-node.error.selected {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4);
+}
+
 .canvas-node-label {
   position: absolute;
   top: -24px;
@@ -696,6 +707,36 @@ video::-webkit-media-controls-enclosure {
   padding: 12px;
   text-align: center;
   border-radius: inherit;
+}
+
+/* Node Error Bar - 底部错误信息条 */
+.cf-node-error-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(220, 38, 38, 0.95);
+  color: #fff;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  border-radius: 0 0 15px 15px;
+  z-index: 15;
+  backdrop-filter: blur(4px);
+}
+
+.cf-node-error-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.cf-node-error-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 

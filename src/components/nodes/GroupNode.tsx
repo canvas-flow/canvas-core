@@ -14,7 +14,7 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps) => {
 
   const style = data.style as any;
   
-  // 反向缩放，使标题文字大小固定不随画布缩放
+  // 反向缩放，使标题和工具栏大小固定不随画布缩放
   const inverseScale = 1 / zoom;
   
   const handleRename = useCallback(() => {
@@ -109,41 +109,40 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps) => {
         onResizeEnd={handleResizeEnd}
       />
       
-      {/* 编组标题 - 左上角位置，使用反向缩放使标题固定大小 */}
-      {isEditing ? (
-        <input
-          autoFocus
-          value={labelInput}
-          onChange={(e) => setLabelInput(e.target.value)}
-          onBlur={handleRename}
-          onKeyDown={(e) => e.key === 'Enter' && handleRename()}
-          onMouseDown={(e) => e.stopPropagation()}
-          className="canvas-node-title-input"
-          style={{ 
-            position: 'absolute',
-            top: -24 * inverseScale,
-            left: 0,
-            transform: `scale(${inverseScale})`,
-            transformOrigin: 'left top',
-          }}
-        />
-      ) : (
-        <div 
-          className="canvas-node-title"
-          style={{
-            position: 'absolute',
-            top: -24 * inverseScale,
-            left: 0,
-            transform: `scale(${inverseScale})`,
-            transformOrigin: 'left top',
-          }}
-          onDoubleClick={() => setIsEditing(true)}
-        >
-          {data.label as string}
-        </div>
-      )}
+      {/* 编组标题 - 左上角位置，使用与节点标题相同的样式，反向缩放保持固定大小 */}
+      <div
+        style={{
+          position: 'absolute',
+          top: -24 * inverseScale,
+          left: 0,
+          transform: `scale(${inverseScale})`,
+          transformOrigin: 'left top',
+          pointerEvents: 'auto',
+        }}
+      >
+        {isEditing ? (
+          <input
+            autoFocus
+            value={labelInput}
+            onChange={(e) => setLabelInput(e.target.value)}
+            onBlur={handleRename}
+            onKeyDown={(e) => e.key === 'Enter' && handleRename()}
+            onMouseDown={(e) => e.stopPropagation()}
+            className="canvas-node-title-input"
+            style={{ position: 'static' }}
+          />
+        ) : (
+          <div 
+            className="canvas-node-title"
+            style={{ position: 'static' }}
+            onDoubleClick={() => setIsEditing(true)}
+          >
+            {data.label as string}
+          </div>
+        )}
+      </div>
 
-      {/* 编组工具栏 - 放在编组正上方中央，使用反向缩放和胶囊按钮组样式 */}
+      {/* 编组工具栏 - 放在编组正上方中央，使用胶囊按钮组样式，反向缩放保持固定大小 */}
       <div 
         style={{
           position: 'absolute',

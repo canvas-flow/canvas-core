@@ -31,6 +31,8 @@ interface CanvasEditorProps {
   renderEmpty?: React.ReactNode;
   
   onNodeAdd?: (node: CanvasFlowNode) => void;
+  /** Callback when node is copied, use to copy params */
+  onNodeCopy?: (sourceNodeId: string, newNodeId: string) => void;
   onNodeMove?: (node: CanvasFlowNode) => void;
   onNodeDelete?: (nodeId: string) => void;
   onNodeDataChange?: (nodeId: string, data: any) => void;
@@ -50,6 +52,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
   onSelectionChange,
   renderEmpty,
   onNodeAdd,
+  onNodeCopy,
   onNodeMove,
   onNodeDelete,
   onNodeDataChange: _onNodeDataChange,
@@ -60,7 +63,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
   onGroupUngroup,
   onGroupUpdate,
 }, _ref) => {
-  const { config, onNodeDataChange, getNodeContextMenuItems, getNodeMedia } = useCanvasContext();
+  const { config, onNodeDataChange, getNodeContextMenuItems, getNodeMedia, updateNodeMedia } = useCanvasContext();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   
@@ -433,6 +436,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
       } else {
         position = rfInstance.screenToFlowPosition({ x: mousePosition.x, y: mousePosition.y });
       }
+      const sourceNodeId = clipboard.id;
       const newNodeId = generateId();
       const newNode = {
         ...clipboard,
@@ -443,12 +447,24 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
       };
       setNodes((nds) => nds.map(n => ({ ...n, selected: false })).concat(newNode));
       setSelectedNodeId(newNodeId);
+      
+      // Copy media/data
+      const sourceMedia = getNodeMedia(sourceNodeId);
+      if (sourceMedia && updateNodeMedia) {
+        updateNodeMedia(newNodeId, { ...sourceMedia });
+      }
+      
+      // Callback to copy params
+      if (onNodeCopy) {
+        onNodeCopy(sourceNodeId, newNodeId);
+      }
+      
       if (onNodeAdd) {
         const [canvasNode] = fromReactFlowNodes([newNode]).nodes;
         onNodeAdd(canvasNode);
       }
     }
-  }, [clipboard, rfInstance, contextMenu, mousePosition, setNodes, onNodeAdd]);
+  }, [clipboard, rfInstance, contextMenu, mousePosition, setNodes, onNodeAdd, onNodeCopy, getNodeMedia, updateNodeMedia]);
 
   const handleDelete = useCallback(() => {
     let targetId: string | undefined;
@@ -634,6 +650,8 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         nodeTypes={reactFlowNodeTypes}
         onSelectionChange={onSelectionChangeInternal}
         fitView
+        minZoom={0.1}
+        maxZoom={2.6}
         nodesDraggable={!readOnly}
         nodesConnectable={!readOnly}
         deleteKeyCode={['Backspace', 'Delete']}

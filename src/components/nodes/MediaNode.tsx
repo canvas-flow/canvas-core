@@ -170,14 +170,21 @@ export const AudioNode: React.FC<NodeContentProps> = ({ data, isConnected }) => 
         className="cf-media-node-container"
         onDoubleClick={() => mediaSrc && setIsModalOpen(true)}
         title="双击打开播放器"
-        style={{ cursor: 'pointer' }}
+        style={{ 
+          cursor: 'pointer', 
+          display: 'flex',
+          justifyContent: 'center', 
+          alignItems: 'center',
+        }}
       >
         {mediaSrc && (
           <audio 
             src={mediaSrc} 
             controls
-            className="cf-media-node-content"
-            style={{ width: '100%', marginTop: 'auto', marginBottom: 'auto' }}
+            style={{ 
+              width: '100%', 
+              minHeight: 54,
+            }}
           />
         )}
       </div>

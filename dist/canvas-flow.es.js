@@ -1,5 +1,5 @@
 import React, { createContext, createElement, forwardRef, memo, useCallback, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { Background, Controls, Handle, MarkerType, NodeResizer, NodeToolbar, Position, ReactFlow, addEdge, useEdges, useEdgesState, useNodesData, useNodesState, useReactFlow } from "@xyflow/react";
+import { Background, Controls, Handle, MarkerType, NodeResizer, NodeToolbar, Position, ReactFlow, addEdge, useEdges, useEdgesState, useNodesData, useNodesState, useReactFlow, useViewport } from "@xyflow/react";
 import { createPortal } from "react-dom";
 var __commonJSMin = (e, t) => () => (t || e((t = { exports: {} }).exports, t), t.exports), __require = /* @__PURE__ */ ((e) => typeof require < "u" ? require : typeof Proxy < "u" ? new Proxy(e, { get: (e, t) => (typeof require < "u" ? require : e)[t] }) : e)(function(e) {
 	if (typeof require < "u") return require.apply(this, arguments);
@@ -466,7 +466,7 @@ var require_react_jsx_runtime_production = /* @__PURE__ */ __commonJSMin(((e) =>
 	process.env.NODE_ENV !== "production" && (function() {
 		function t(e) {
 			if (e == null) return null;
-			if (typeof e == "function") return e.$$typeof === O ? null : e.displayName || e.name || null;
+			if (typeof e == "function") return e.$$typeof === E ? null : e.displayName || e.name || null;
 			if (typeof e == "string") return e;
 			switch (e) {
 				case _: return "Fragment";
@@ -474,13 +474,13 @@ var require_react_jsx_runtime_production = /* @__PURE__ */ __commonJSMin(((e) =>
 				case v: return "StrictMode";
 				case S: return "Suspense";
 				case C: return "SuspenseList";
-				case E: return "Activity";
+				case fe: return "Activity";
 			}
 			if (typeof e == "object") switch (typeof e.tag == "number" && console.error("Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue."), e.$$typeof) {
 				case g: return "Portal";
 				case x: return e.displayName || "Context";
 				case b: return (e._context.displayName || "Context") + ".Consumer";
-				case fe:
+				case de:
 					var n = e.render;
 					return e = e.displayName, e ||= (e = n.displayName || n.name || "", e === "" ? "ForwardRef" : "ForwardRef(" + e + ")"), e;
 				case w: return n = e.displayName || null, n === null ? t(e.type) || "Memo" : n;
@@ -519,14 +519,14 @@ var require_react_jsx_runtime_production = /* @__PURE__ */ __commonJSMin(((e) =>
 			}
 		}
 		function a() {
-			var e = k.A;
+			var e = O.A;
 			return e === null ? null : e.getOwner();
 		}
 		function o() {
 			return Error("react-stack-top-frame");
 		}
 		function s(e) {
-			if (A.call(e, "key")) {
+			if (k.call(e, "key")) {
 				var t = Object.getOwnPropertyDescriptor(e, "key").get;
 				if (t && t.isReactWarning) return !1;
 			}
@@ -534,7 +534,7 @@ var require_react_jsx_runtime_production = /* @__PURE__ */ __commonJSMin(((e) =>
 		}
 		function c(e, t) {
 			function n() {
-				N || (N = !0, console.error("%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)", t));
+				M || (M = !0, console.error("%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)", t));
 			}
 			n.isReactWarning = !0, Object.defineProperty(e, "key", {
 				get: n,
@@ -543,7 +543,7 @@ var require_react_jsx_runtime_production = /* @__PURE__ */ __commonJSMin(((e) =>
 		}
 		function l() {
 			var e = t(this.type);
-			return P[e] || (P[e] = !0, console.error("Accessing element.ref was removed in React 19. ref is now a regular prop. It will be removed from the JSX Element type in a future release.")), e = this.props.ref, e === void 0 ? null : e;
+			return N[e] || (N[e] = !0, console.error("Accessing element.ref was removed in React 19. ref is now a regular prop. It will be removed from the JSX Element type in a future release.")), e = this.props.ref, e === void 0 ? null : e;
 		}
 		function u(e, t, n, r, i, a) {
 			var o = n.ref;
@@ -583,17 +583,17 @@ var require_react_jsx_runtime_production = /* @__PURE__ */ __commonJSMin(((e) =>
 		}
 		function d(e, n, i, o, l, d) {
 			var p = n.children;
-			if (p !== void 0) if (o) if (j(p)) {
+			if (p !== void 0) if (o) if (A(p)) {
 				for (o = 0; o < p.length; o++) f(p[o]);
 				Object.freeze && Object.freeze(p);
 			} else console.error("React.jsx: Static children should always be an array. You are likely explicitly calling React.jsxs or React.jsxDEV. Use the Babel transform instead.");
 			else f(p);
-			if (A.call(n, "key")) {
+			if (k.call(n, "key")) {
 				p = t(e);
 				var m = Object.keys(n).filter(function(e) {
 					return e !== "key";
 				});
-				o = 0 < m.length ? "{key: someKey, " + m.join(": ..., ") + ": ...}" : "{key: someKey}", L[p + o] || (m = 0 < m.length ? "{" + m.join(": ..., ") + ": ...}" : "{}", console.error("A props object containing a \"key\" prop is being spread into JSX:\n  let props = %s;\n  <%s {...props} />\nReact keys must be passed directly to JSX without using spread:\n  let props = %s;\n  <%s key={someKey} {...props} />", o, p, m, p), L[p + o] = !0);
+				o = 0 < m.length ? "{key: someKey, " + m.join(": ..., ") + ": ...}" : "{key: someKey}", I[p + o] || (m = 0 < m.length ? "{" + m.join(": ..., ") + ": ...}" : "{}", console.error("A props object containing a \"key\" prop is being spread into JSX:\n  let props = %s;\n  <%s {...props} />\nReact keys must be passed directly to JSX without using spread:\n  let props = %s;\n  <%s key={someKey} {...props} />", o, p, m, p), I[p + o] = !0);
 			}
 			if (p = null, i !== void 0 && (r(i), p = "" + i), s(n) && (r(n.key), p = "" + n.key), "key" in n) for (var h in i = {}, n) h !== "key" && (i[h] = n[h]);
 			else i = n;
@@ -605,19 +605,19 @@ var require_react_jsx_runtime_production = /* @__PURE__ */ __commonJSMin(((e) =>
 		function p(e) {
 			return typeof e == "object" && !!e && e.$$typeof === h;
 		}
-		var m = __require("react"), h = Symbol.for("react.transitional.element"), g = Symbol.for("react.portal"), _ = Symbol.for("react.fragment"), v = Symbol.for("react.strict_mode"), y = Symbol.for("react.profiler"), b = Symbol.for("react.consumer"), x = Symbol.for("react.context"), fe = Symbol.for("react.forward_ref"), S = Symbol.for("react.suspense"), C = Symbol.for("react.suspense_list"), w = Symbol.for("react.memo"), T = Symbol.for("react.lazy"), E = Symbol.for("react.activity"), O = Symbol.for("react.client.reference"), k = m.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, A = Object.prototype.hasOwnProperty, j = Array.isArray, M = console.createTask ? console.createTask : function() {
+		var m = __require("react"), h = Symbol.for("react.transitional.element"), g = Symbol.for("react.portal"), _ = Symbol.for("react.fragment"), v = Symbol.for("react.strict_mode"), y = Symbol.for("react.profiler"), b = Symbol.for("react.consumer"), x = Symbol.for("react.context"), de = Symbol.for("react.forward_ref"), S = Symbol.for("react.suspense"), C = Symbol.for("react.suspense_list"), w = Symbol.for("react.memo"), T = Symbol.for("react.lazy"), fe = Symbol.for("react.activity"), E = Symbol.for("react.client.reference"), O = m.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, k = Object.prototype.hasOwnProperty, A = Array.isArray, j = console.createTask ? console.createTask : function() {
 			return null;
 		};
 		m = { react_stack_bottom_frame: function(e) {
 			return e();
 		} };
-		var N, P = {}, F = m.react_stack_bottom_frame.bind(m, o)(), I = M(i(o)), L = {};
+		var M, N = {}, P = m.react_stack_bottom_frame.bind(m, o)(), F = j(i(o)), I = {};
 		e.Fragment = _, e.jsx = function(e, t, n) {
-			var r = 1e4 > k.recentlyCreatedOwnerStacks++;
-			return d(e, t, n, !1, r ? Error("react-stack-top-frame") : F, r ? M(i(e)) : I);
+			var r = 1e4 > O.recentlyCreatedOwnerStacks++;
+			return d(e, t, n, !1, r ? Error("react-stack-top-frame") : P, r ? j(i(e)) : F);
 		}, e.jsxs = function(e, t, n) {
-			var r = 1e4 > k.recentlyCreatedOwnerStacks++;
-			return d(e, t, n, !0, r ? Error("react-stack-top-frame") : F, r ? M(i(e)) : I);
+			var r = 1e4 > O.recentlyCreatedOwnerStacks++;
+			return d(e, t, n, !0, r ? Error("react-stack-top-frame") : P, r ? j(i(e)) : F);
 		};
 	})();
 })), import_jsx_runtime = (/* @__PURE__ */ __commonJSMin(((e, t) => {
@@ -843,7 +843,7 @@ const CanvasProvider = ({ children: e, ...t }) => /* @__PURE__ */ (0, import_jsx
 	if (!e) throw Error("useCanvasContext must be used within a CanvasProvider");
 	return e;
 }, NodeTitleEditor = ({ title: e, defaultTitle: t, onChange: n, className: r = "" }) => {
-	let [i, a] = useState(!1), o = e || t, s = o.length > 15 ? o.slice(0, 15) + "..." : o;
+	let [i, a] = useState(!1), { zoom: o } = useViewport(), s = 1 / o, c = e || t, l = c.length > 15 ? c.slice(0, 15) + "..." : c;
 	return i ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
 		className: `nodrag canvas-node-title-input ${r}`,
 		autoFocus: !0,
@@ -859,7 +859,7 @@ const CanvasProvider = ({ children: e, ...t }) => /* @__PURE__ */ (0, import_jsx
 		onMouseDown: (e) => e.stopPropagation(),
 		style: {
 			position: "absolute",
-			top: "-24px",
+			top: `${-24 * s}px`,
 			left: "0",
 			background: "rgba(0, 0, 0, 0.8)",
 			border: "1px solid #555",
@@ -870,15 +870,17 @@ const CanvasProvider = ({ children: e, ...t }) => /* @__PURE__ */ (0, import_jsx
 			fontWeight: "500",
 			outline: "none",
 			minWidth: "50px",
-			maxWidth: "200px"
+			maxWidth: "200px",
+			transform: `scale(${s})`,
+			transformOrigin: "left top"
 		}
 	}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: `canvas-node-title ${r}`,
 		onDoubleClick: () => a(!0),
-		title: o,
+		title: c,
 		style: {
 			position: "absolute",
-			top: "-24px",
+			top: `${-24 * s}px`,
 			left: "0",
 			color: "#888",
 			fontSize: "13px",
@@ -886,7 +888,9 @@ const CanvasProvider = ({ children: e, ...t }) => /* @__PURE__ */ (0, import_jsx
 			whiteSpace: "nowrap",
 			cursor: "text",
 			transition: "color 0.2s",
-			pointerEvents: "auto"
+			pointerEvents: "auto",
+			transform: `scale(${s})`,
+			transformOrigin: "left top"
 		},
 		onMouseEnter: (e) => {
 			e.currentTarget.style.color = "#ccc";
@@ -894,7 +898,7 @@ const CanvasProvider = ({ children: e, ...t }) => /* @__PURE__ */ (0, import_jsx
 		onMouseLeave: (e) => {
 			e.currentTarget.style.color = "#888";
 		},
-		children: s
+		children: l
 	});
 };
 function useDebouncedCallback(e, t) {
@@ -908,34 +912,34 @@ function useDebouncedCallback(e, t) {
 	}, [t]);
 }
 const UniversalNode = memo((e) => {
-	let { id: t, data: n, selected: r, style: i } = e, { config: a, components: o, readOnly: c, onNodeRun: u, runningNodeId: f, isExecuting: p, onNodeDataChange: h, inspectingNodeId: g, mediaMap: y, mediaEmitter: b, updateNodeMedia: fe, renderNodeInspector: C } = useCanvasContext(), { setNodes: T, getNode: E } = useReactFlow(), D = useEdges(), [O, k] = useState(() => {
+	let { id: t, data: n, selected: r, style: i } = e, { config: a, components: o, readOnly: c, onNodeRun: u, runningNodeId: f, isExecuting: p, onNodeDataChange: h, inspectingNodeId: g, mediaMap: y, mediaEmitter: b, updateNodeMedia: de, renderNodeInspector: C } = useCanvasContext(), { setNodes: T, getNode: fe } = useReactFlow(), E = useEdges(), [D, O] = useState(() => {
 		let e = y.get(t);
 		return e && Object.keys(e).length > 0 ? e : n || {};
 	});
 	useEffect(() => {
 		let e = (e) => {
-			k(e);
+			O(e);
 		};
 		return b.on(t, e), () => b.off(t, e);
 	}, [t, b]);
-	let A = e.type || "default", j = a.nodeDefinitions.find((e) => e.type === A);
-	if (!j) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+	let k = e.type || "default", A = a.nodeDefinitions.find((e) => e.type === k);
+	if (!A) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		style: {
 			padding: 10,
 			border: "1px solid red",
 			borderRadius: 4,
 			background: "#fff0f0"
 		},
-		children: ["Unknown node type: ", A]
+		children: ["Unknown node type: ", k]
 	});
-	let M = o[j.component], N = useDebouncedCallback((e, t) => {
+	let j = o[A.component], M = useDebouncedCallback((e, t) => {
 		h && h(e, t);
-	}, 500), P = (e) => {
+	}, 500), N = (e) => {
 		let n = {
-			...O,
+			...D,
 			...e
 		};
-		k(n), y.set(t, n), b.emit(t, n), T((n) => n.map((n) => {
+		O(n), y.set(t, n), b.emit(t, n), T((n) => n.map((n) => {
 			if (n.id === t) {
 				let r = {
 					...n.data,
@@ -951,9 +955,9 @@ const UniversalNode = memo((e) => {
 				};
 			}
 			return n;
-		})), N(t, e);
-	}, F = D.some((e) => e.source === t || e.target === t), I = useNodesData(useMemo(() => D.filter((e) => e.target === t).map((e) => e.source), [D, t]));
-	useMemo(() => I ? (Array.isArray(I) ? I : [I]).map((e) => {
+		})), M(t, e);
+	}, P = E.some((e) => e.source === t || e.target === t), F = useNodesData(useMemo(() => E.filter((e) => e.target === t).map((e) => e.source), [E, t]));
+	useMemo(() => F ? (Array.isArray(F) ? F : [F]).map((e) => {
 		if (!e) return null;
 		let t = a.nodeDefinitions.find((t) => t.type === e.type);
 		return {
@@ -962,21 +966,25 @@ const UniversalNode = memo((e) => {
 			label: t?.label,
 			data: e.data
 		};
-	}).filter((e) => !!e) : [], [I, a.nodeDefinitions]);
-	let L = {
+	}).filter((e) => !!e) : [], [F, a.nodeDefinitions]);
+	let I = {
 		nodeId: t,
 		data: {
 			...n,
-			...O
+			...D
 		},
 		selected: !!r,
-		isConnected: F,
-		onChange: P,
+		isConnected: P,
+		onChange: N,
 		onRun: u ? () => u(t) : void 0,
 		style: i
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: `canvas-node ${r ? "selected" : ""}`,
+		className: [
+			"canvas-node",
+			r ? "selected" : "",
+			D._error ? "error" : ""
+		].filter(Boolean).join(" "),
 		style: {
 			width: "100%",
 			height: "100%"
@@ -989,19 +997,19 @@ const UniversalNode = memo((e) => {
 					nodeId: t,
 					node: {
 						id: t,
-						type: A,
+						type: k,
 						position: {
 							x: 0,
 							y: 0
 						},
-						data: O
+						data: D
 					}
 				})
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NodeTitleEditor, {
-				title: O.title || "",
-				defaultTitle: j.label,
-				onChange: P
+				title: D.title || "",
+				defaultTitle: A.label,
+				onChange: N
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Handle, {
 				type: "target",
@@ -1011,77 +1019,50 @@ const UniversalNode = memo((e) => {
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "canvas-node-body",
 				style: { position: "relative" },
-				children: [
-					M ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(M, { ...L }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						style: { padding: 10 },
-						children: ["Missing Component: ", j.component]
-					}),
-					(O._loading || O._executionStatus === "running") && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "cf-upload-loading-overlay",
-						style: {
-							position: "absolute",
-							top: 0,
-							left: 0,
-							width: "100%",
-							height: "100%",
-							background: "rgba(0,0,0,0.7)",
-							display: "flex",
-							flexDirection: "column",
-							alignItems: "center",
-							justifyContent: "center",
-							zIndex: 20,
-							color: "#fff",
-							gap: 8,
-							borderRadius: "inherit"
-						},
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, {
-								className: "cf-spinner",
-								size: 24,
-								style: { animation: "spin 1s linear infinite" }
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								style: { fontSize: 12 },
-								children: "Running..."
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("style", { children: "@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }" })
-						]
-					}),
-					O._error && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "cf-node-error-overlay",
-						style: {
-							position: "absolute",
-							top: 0,
-							left: 0,
-							width: "100%",
-							height: "100%",
-							background: "rgba(220, 38, 38, 0.9)",
-							display: "flex",
-							flexDirection: "column",
-							alignItems: "center",
-							justifyContent: "center",
-							zIndex: 20,
-							color: "#fff",
-							gap: 8,
-							borderRadius: "inherit",
-							padding: 12
-						},
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							style: {
-								fontSize: 14,
-								fontWeight: 600
-							},
-							children: "⚠️ Error"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							style: {
-								fontSize: 12,
-								textAlign: "center",
-								wordBreak: "break-word"
-							},
-							children: O._error
-						})]
-					})
-				]
+				children: [j ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(j, { ...I }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					style: { padding: 10 },
+					children: ["Missing Component: ", A.component]
+				}), (D._loading || D._executionStatus === "running") && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "cf-upload-loading-overlay",
+					style: {
+						position: "absolute",
+						top: 0,
+						left: 0,
+						width: "100%",
+						height: "100%",
+						background: "rgba(0,0,0,0.7)",
+						display: "flex",
+						flexDirection: "column",
+						alignItems: "center",
+						justifyContent: "center",
+						zIndex: 20,
+						color: "#fff",
+						gap: 8,
+						borderRadius: "inherit"
+					},
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, {
+							className: "cf-spinner",
+							size: 24,
+							style: { animation: "spin 1s linear infinite" }
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							style: { fontSize: 12 },
+							children: "Running..."
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("style", { children: "@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }" })
+					]
+				})]
+			}),
+			D._error && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "cf-node-error-bar",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "cf-node-error-icon",
+					children: "⚠️"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "cf-node-error-text",
+					children: D._error
+				})]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Handle, {
 				type: "source",
@@ -1091,32 +1072,32 @@ const UniversalNode = memo((e) => {
 		]
 	});
 }), GroupNode = memo(({ id: t, data: n, selected: r }) => {
-	let { setNodes: i } = useReactFlow(), { onGroupAction: o } = useCanvasContext(), [s, c] = useState(!1), [u, f] = useState(n.label || "Group"), p = n.style, m = useCallback(() => {
-		c(!1), i((e) => e.map((e) => e.id === t ? {
+	let { setNodes: i } = useReactFlow(), { onGroupAction: o } = useCanvasContext(), { zoom: s } = useViewport(), [c, u] = useState(!1), [f, p] = useState(n.label || "Group"), m = n.style, h = 1 / s, _ = useCallback(() => {
+		u(!1), i((e) => e.map((e) => e.id === t ? {
 			...e,
 			data: {
 				...e.data,
-				label: u
+				label: f
 			}
 		} : e)), o && o("update", {
 			id: t,
-			label: u
+			label: f
 		});
 	}, [
 		t,
-		u,
+		f,
 		i,
 		o
-	]), h = useCallback((e) => {
+	]), v = useCallback((e) => {
 		e.stopPropagation(), o && o("ungroup", { id: t });
-	}, [t, o]), _ = useCallback((e) => {
+	}, [t, o]), y = useCallback((e) => {
 		e.stopPropagation(), o && o("run", { id: t });
-	}, [t, o]), v = useMemo(() => [
+	}, [t, o]), b = useMemo(() => [
 		{
 			id: "run",
 			label: "整组执行",
 			icon: Play,
-			onClick: _,
+			onClick: y,
 			className: "text-green"
 		},
 		{
@@ -1131,29 +1112,29 @@ const UniversalNode = memo((e) => {
 			id: "ungroup",
 			label: "解组",
 			icon: Ungroup,
-			onClick: h
+			onClick: v
 		}
-	], [_, h]), y = n.toolbarActions || v, b = useCallback((e, n) => {
+	], [y, v]), x = n.toolbarActions || b, de = useCallback((e, n) => {
 		o && o("update", {
 			id: t,
 			width: n.width,
 			height: n.height,
 			style: {
-				...p,
+				...m,
 				width: n.width,
 				height: n.height
 			}
 		});
 	}, [
 		t,
-		p,
+		m,
 		o
 	]);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		style: {
 			width: "100%",
 			height: "100%",
-			backgroundColor: p?.backgroundColor || "rgba(30, 30, 30, 0.6)",
+			backgroundColor: m?.backgroundColor || "rgba(30, 30, 30, 0.6)",
 			border: r ? "1px solid #ffffff" : "1px solid rgba(255,255,255,0.1)",
 			borderRadius: 12,
 			position: "relative",
@@ -1172,37 +1153,40 @@ const UniversalNode = memo((e) => {
 					borderRadius: 2
 				},
 				color: "#ffffff",
-				onResizeEnd: b
-			}),
-			s ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
-				autoFocus: !0,
-				value: u,
-				onChange: (e) => f(e.target.value),
-				onBlur: m,
-				onKeyDown: (e) => e.key === "Enter" && m(),
-				onMouseDown: (e) => e.stopPropagation(),
-				className: "canvas-node-title-input",
-				style: {
-					position: "absolute",
-					top: -24,
-					left: 0
-				}
-			}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "canvas-node-title",
-				style: {
-					position: "absolute",
-					top: -24,
-					left: 0
-				},
-				onDoubleClick: () => c(!0),
-				children: n.label
+				onResizeEnd: de
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 				style: {
 					position: "absolute",
-					top: -56,
+					top: -24 * h,
+					left: 0,
+					transform: `scale(${h})`,
+					transformOrigin: "left top",
+					pointerEvents: "auto"
+				},
+				children: c ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+					autoFocus: !0,
+					value: f,
+					onChange: (e) => p(e.target.value),
+					onBlur: _,
+					onKeyDown: (e) => e.key === "Enter" && _(),
+					onMouseDown: (e) => e.stopPropagation(),
+					className: "canvas-node-title-input",
+					style: { position: "static" }
+				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "canvas-node-title",
+					style: { position: "static" },
+					onDoubleClick: () => u(!0),
+					children: n.label
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				style: {
+					position: "absolute",
+					top: -56 * h,
 					left: "50%",
-					transform: "translateX(-50%)",
+					transform: `translateX(-50%) scale(${h})`,
+					transformOrigin: "center top",
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "center",
@@ -1224,7 +1208,7 @@ const UniversalNode = memo((e) => {
 						pointerEvents: r ? "auto" : "none"
 					},
 					onMouseDown: (e) => e.stopPropagation(),
-					children: y.map((t) => {
+					children: x.map((t) => {
 						let n = t.icon, r = t.className?.includes("text-green");
 						return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
 							onClick: t.onClick,
@@ -1480,36 +1464,36 @@ function useCanvasConnection({ nodes: e, edges: t, setEdges: n, setNodes: r, onE
 		])
 	};
 }
-const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onChange: r, onSelectionChange: i, renderEmpty: o, onNodeAdd: c, onNodeMove: m, onNodeDelete: h, onNodeDataChange: g, onEdgeAdd: _, onEdgeDelete: v, onGroupAdd: b, onGroupDelete: x, onGroupUngroup: S, onGroupUpdate: w }, T) => {
-	let { config: E, onNodeDataChange: D, getNodeContextMenuItems: O, getNodeMedia: k } = useCanvasContext(), [A, j, M] = useNodesState([]), [N, R, pe] = useEdgesState([]), [z, me] = useState(null), { isConnecting: B, connectionMenu: he, setConnectionMenu: V, isValidConnection: H, onConnect: U, onConnectStart: W, onConnectEnd: ge, handleMenuAddNode: _e, availableNodeTypes: ve } = useCanvasConnection({
-		nodes: A,
-		edges: N,
+const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onChange: r, onSelectionChange: i, renderEmpty: o, onNodeAdd: c, onNodeCopy: m, onNodeMove: h, onNodeDelete: g, onNodeDataChange: _, onEdgeAdd: v, onEdgeDelete: b, onGroupAdd: x, onGroupDelete: S, onGroupUngroup: w, onGroupUpdate: T }, fe) => {
+	let { config: E, onNodeDataChange: D, getNodeContextMenuItems: O, getNodeMedia: k, updateNodeMedia: A } = useCanvasContext(), [j, M, N] = useNodesState([]), [L, R, z] = useEdgesState([]), [B, V] = useState(null), { isConnecting: me, connectionMenu: H, setConnectionMenu: U, isValidConnection: W, onConnect: G, onConnectStart: he, onConnectEnd: ge, handleMenuAddNode: _e, availableNodeTypes: ve } = useCanvasConnection({
+		nodes: j,
+		edges: L,
 		setEdges: R,
-		setNodes: j,
-		onEdgeAdd: _,
+		setNodes: M,
+		onEdgeAdd: v,
 		onNodeAdd: c,
 		config: E,
-		rfInstance: z
-	}), [K, q] = useState(null), [J, Ce] = useState(null), [we, Te] = useState({
+		rfInstance: B
+	}), [q, J] = useState(null), [Y, Ce] = useState(null), [we, Te] = useState({
 		x: 0,
 		y: 0
-	}), [Ee, Y] = useState(null);
+	}), [Ee, Z] = useState(null);
 	useEffect(() => {
-		t && (j(toReactFlowNodes(t.nodes, t.groups)), R(toReactFlowEdges(t.edges)));
+		t && (M(toReactFlowNodes(t.nodes, t.groups)), R(toReactFlowEdges(t.edges)));
 	}, []);
 	let De = useRef(r);
 	useEffect(() => {
 		De.current = r;
 	}, [r]), useEffect(() => {
 		if (De.current) {
-			let { nodes: e, groups: t } = fromReactFlowNodes(A), n = {
+			let { nodes: e, groups: t } = fromReactFlowNodes(j), n = {
 				nodes: e,
-				edges: fromReactFlowEdges(N),
+				edges: fromReactFlowEdges(L),
 				groups: t
 			};
 			De.current(n);
 		}
-	}, [A, N]), useEffect(() => {
+	}, [j, L]), useEffect(() => {
 		let e = (e) => {
 			Te({
 				x: e.clientX,
@@ -1524,46 +1508,46 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 			e[t.type] = UniversalNode;
 		}), e;
 	}, [E.nodeDefinitions]), ke = useCallback((e) => {
-		M(e), e.forEach((e) => {
-			e.type === "remove" && h && h(e.id);
+		N(e), e.forEach((e) => {
+			e.type === "remove" && g && g(e.id);
 		});
-	}, [M, h]), Ae = useCallback((e) => {
-		pe(e), e.forEach((e) => {
-			e.type === "remove" && v && v(e.id);
+	}, [N, g]), Ae = useCallback((e) => {
+		z(e), e.forEach((e) => {
+			e.type === "remove" && b && b(e.id);
 		});
-	}, [pe, v]), je = useCallback(({ nodes: e }) => {
+	}, [z, b]), je = useCallback(({ nodes: e }) => {
 		if (e.length > 0) {
 			let t = e[0];
-			t.type === "group" ? Y(null) : Y(t.id);
-		} else Y(null);
+			t.type === "group" ? Z(null) : Z(t.id);
+		} else Z(null);
 		i && i(e.filter((e) => e.type !== "group").map((e) => e.id));
 	}, [i]), Me = useCallback((e, t, n) => {
 		if (t.type === "group") {
-			w && w({
+			T && T({
 				id: t.id,
 				position: t.position
 			});
 			return;
 		}
-		if (m) {
-			let { nodes: e } = fromReactFlowNodes(A), n = e.find((e) => e.id === t.id);
-			n && m(n);
+		if (h) {
+			let { nodes: e } = fromReactFlowNodes(j), n = e.find((e) => e.id === t.id);
+			n && h(n);
 		}
 	}, [
-		m,
-		w,
-		A
+		h,
+		T,
+		j
 	]), Ne = useCallback((e) => {
-		e.detail === 2 && !n && V({
+		e.detail === 2 && !n && U({
 			isOpen: !0,
 			position: {
 				x: e.clientX,
 				y: e.clientY
 			},
 			source: null
-		}), q(null);
+		}), J(null);
 	}, [n]), Pe = useCallback((e, t) => {
-		e.preventDefault(), e.stopPropagation(), q({
+		e.preventDefault(), e.stopPropagation(), J({
 			isOpen: !0,
 			position: {
 				x: e.clientX,
@@ -1574,8 +1558,8 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 		});
 	}, []), Fe = useCallback((e) => {
 		e.preventDefault();
-		let t = A.filter((e) => e.selected && e.type !== "group");
-		q({
+		let t = j.filter((e) => e.selected && e.type !== "group");
+		J({
 			isOpen: !0,
 			position: {
 				x: e.clientX,
@@ -1583,8 +1567,8 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 			},
 			type: t.length > 1 ? "multi" : "pane"
 		});
-	}, [A]), Ie = useCallback((e, t) => {
-		e.preventDefault(), e.stopPropagation(), q({
+	}, [j]), Ie = useCallback((e, t) => {
+		e.preventDefault(), e.stopPropagation(), J({
 			isOpen: !0,
 			position: {
 				x: e.clientX,
@@ -1593,10 +1577,10 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 			type: "edge",
 			targetId: t.id
 		});
-	}, []), Z = useCallback(() => {
-		let e = A.filter((e) => e.selected && e.type !== "group");
+	}, []), Q = useCallback(() => {
+		let e = j.filter((e) => e.selected && e.type !== "group");
 		if (e.length === 0) return;
-		let { nodes: t } = fromReactFlowNodes(A), n = new Map(t.map((e) => [e.id, e])), r = /* @__PURE__ */ new Set();
+		let { nodes: t } = fromReactFlowNodes(j), n = new Map(t.map((e) => [e.id, e])), r = /* @__PURE__ */ new Set();
 		e.forEach((e) => {
 			e.data._groupId && r.add(e.data._groupId);
 		});
@@ -1611,7 +1595,7 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 			position: e.position,
 			width: 200,
 			height: 100
-		}))), s = new Map(A.map((e) => [e.id, e])), c = getBounds(a.map((e) => {
+		}))), s = new Map(j.map((e) => [e.id, e])), c = getBounds(a.map((e) => {
 			let t = s.get(e.id);
 			return {
 				position: e.position,
@@ -1631,8 +1615,8 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 			width: l.width + 40,
 			height: l.height + 40
 		};
-		b && b(d), r.forEach((e) => {
-			x && x(e);
+		x && x(d), r.forEach((e) => {
+			S && S(e);
 		});
 		let f = {
 			id: u,
@@ -1652,7 +1636,7 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 			},
 			selected: !0
 		};
-		j((e) => [f, ...e.filter((e) => e.type !== "group" || !r.has(e.id)).map((e) => {
+		M((e) => [f, ...e.filter((e) => e.type !== "group" || !r.has(e.id)).map((e) => {
 			if (i.has(e.id)) {
 				D && D(e.id, {
 					...e.data,
@@ -1675,18 +1659,18 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 				};
 			}
 			return e;
-		})]), q(null);
+		})]), J(null);
 	}, [
-		A,
 		j,
-		b,
+		M,
 		x,
+		S,
 		D
-	]), Q = useCallback((e) => {
-		let t = e || K?.targetId || A.find((e) => e.selected && e.type === "group")?.id;
+	]), $ = useCallback((e) => {
+		let t = e || q?.targetId || j.find((e) => e.selected && e.type === "group")?.id;
 		if (!t) return;
-		let { nodes: n } = fromReactFlowNodes(A), r = new Map(n.map((e) => [e.id, e])), i = A.filter((e) => e.data?._groupId === t || e.parentId === t).map((e) => e.id);
-		S && S(t, i), j((e) => e.filter((e) => e.id !== t).map((e) => {
+		let { nodes: n } = fromReactFlowNodes(j), r = new Map(n.map((e) => [e.id, e])), i = j.filter((e) => e.data?._groupId === t || e.parentId === t).map((e) => e.id);
+		w && w(t, i), M((e) => e.filter((e) => e.id !== t).map((e) => {
 			if (e.data?._groupId === t || e.parentId === t) {
 				D && D(e.id, {
 					...e.data,
@@ -1707,129 +1691,134 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 				};
 			}
 			return e;
-		})), q(null);
+		})), J(null);
 	}, [
-		K,
-		A,
+		q,
 		j,
-		S,
+		M,
+		w,
 		D
-	]), $ = useCallback(() => {
-		let e = K?.type === "node" ? K.targetId : null;
+	]), Le = useCallback(() => {
+		let e = q?.type === "node" ? q.targetId : null;
 		if (!e && Ee && (e = Ee), e) {
-			let t = A.find((t) => t.id === e);
+			let t = j.find((t) => t.id === e);
 			t && Ce(t);
 		}
 	}, [
-		K,
-		A,
+		q,
+		j,
 		Ee
-	]), Le = useCallback(() => {
-		if (J && z) {
+	]), Re = useCallback(() => {
+		if (Y && B) {
 			let e;
-			e = K ? z.screenToFlowPosition({
-				x: K.position.x,
-				y: K.position.y
-			}) : z.screenToFlowPosition({
+			e = q ? B.screenToFlowPosition({
+				x: q.position.x,
+				y: q.position.y
+			}) : B.screenToFlowPosition({
 				x: we.x,
 				y: we.y
 			});
-			let t = generateId(), n = {
-				...J,
-				id: t,
+			let t = Y.id, n = generateId(), r = {
+				...Y,
+				id: n,
 				position: e,
 				selected: !0,
 				data: {
-					...J.data,
+					...Y.data,
 					_groupId: void 0
 				}
 			};
-			if (j((e) => e.map((e) => ({
+			M((e) => e.map((e) => ({
 				...e,
 				selected: !1
-			})).concat(n)), Y(t), c) {
-				let [e] = fromReactFlowNodes([n]).nodes;
+			})).concat(r)), Z(n);
+			let i = k(t);
+			if (i && A && A(n, { ...i }), m && m(t, n), c) {
+				let [e] = fromReactFlowNodes([r]).nodes;
 				c(e);
 			}
 		}
 	}, [
-		J,
-		z,
-		K,
+		Y,
+		B,
+		q,
 		we,
-		j,
-		c
-	]), Re = useCallback(() => {
+		M,
+		c,
+		m,
+		k,
+		A
+	]), ze = useCallback(() => {
 		let e, t = !1, n = !1;
-		if (K) e = K.targetId, t = K.type === "edge", n = K.type === "group";
+		if (q) e = q.targetId, t = q.type === "edge", n = q.type === "group";
 		else {
-			let r = A.find((e) => e.selected), i = N.find((e) => e.selected);
+			let r = j.find((e) => e.selected), i = L.find((e) => e.selected);
 			r ? (e = r.id, n = r.type === "group") : i && (e = i.id, t = !0);
 		}
 		if (e) {
-			if (t) R((t) => t.filter((t) => t.id !== e)), v && v(e);
+			if (t) R((t) => t.filter((t) => t.id !== e)), b && b(e);
 			else if (n) {
-				x && x(e);
-				let t = A.filter((t) => t.parentId === e || t.data?._groupId === e).map((e) => e.id);
-				j((n) => n.filter((n) => n.id !== e && !t.includes(n.id))), R((e) => e.filter((e) => !t.includes(e.source) && !t.includes(e.target)));
-			} else j((t) => t.filter((t) => t.id !== e)), R((t) => t.filter((t) => t.source !== e && t.target !== e)), h && h(e);
-			q(null);
+				S && S(e);
+				let t = j.filter((t) => t.parentId === e || t.data?._groupId === e).map((e) => e.id);
+				M((n) => n.filter((n) => n.id !== e && !t.includes(n.id))), R((e) => e.filter((e) => !t.includes(e.source) && !t.includes(e.target)));
+			} else M((t) => t.filter((t) => t.id !== e)), R((t) => t.filter((t) => t.source !== e && t.target !== e)), g && g(e);
+			J(null);
 		}
 	}, [
-		K,
-		A,
-		N,
+		q,
 		j,
+		L,
+		M,
 		R,
-		h,
-		v,
-		x
+		g,
+		b,
+		S
 	]);
 	useEffect(() => {
 		let e = (e) => {
 			if (n) return;
 			let t = document.activeElement;
-			t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.getAttribute("contenteditable") === "true") || ((e.ctrlKey || e.metaKey) && e.key === "c" ? $() : (e.ctrlKey || e.metaKey) && e.key === "v" ? Le() : (e.ctrlKey || e.metaKey) && e.key === "g" && (e.preventDefault(), Z()));
+			t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.getAttribute("contenteditable") === "true") || ((e.ctrlKey || e.metaKey) && e.key === "c" ? Le() : (e.ctrlKey || e.metaKey) && e.key === "v" ? Re() : (e.ctrlKey || e.metaKey) && e.key === "g" && (e.preventDefault(), Q()));
 		};
 		return window.addEventListener("keydown", e), () => window.removeEventListener("keydown", e);
 	}, [
-		$,
 		Le,
-		Z,
+		Re,
+		Q,
 		n
 	]);
-	let ze = useMemo(() => {
-		let e = [], t = K?.type === "edge";
-		if (K?.type === "multi" && e.push({
+	let Be = useMemo(() => {
+		let e = [], t = q?.type === "edge";
+		if (q?.type === "multi" && e.push({
 			label: "创建分组 (Group)",
-			onClick: Z,
+			onClick: Q,
 			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FolderInput, { size: 16 }),
 			shortcut: "Ctrl+G"
-		}), (K?.type === "node" || K?.type === "edge") && e.push({
+		}), (q?.type === "node" || q?.type === "edge") && e.push({
 			label: "复制 (Copy)",
-			onClick: $,
-			disabled: K.type !== "node",
+			onClick: Le,
+			disabled: q.type !== "node",
 			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Copy, { size: 16 }),
 			shortcut: "Ctrl+C"
-		}), (K?.type === "pane" || K?.type === "node") && e.push({
+		}), (q?.type === "pane" || q?.type === "node") && e.push({
 			label: "粘贴 (Paste)",
-			onClick: Le,
-			disabled: !J || t,
+			onClick: Re,
+			disabled: !Y || t,
 			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Clipboard, { size: 16 }),
 			shortcut: "Ctrl+V"
 		}), e.push({
 			label: "删除 (Delete)",
-			onClick: Re,
+			onClick: ze,
 			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { size: 16 }),
 			shortcut: "Del"
-		}), K?.type === "group" && e.push({
+		}), q?.type === "group" && e.push({
 			label: "解散分组 (Ungroup)",
-			onClick: Q,
+			onClick: $,
 			icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Group, { size: 16 })
-		}), K?.type === "node" && K.targetId && O && A.find((e) => e.id === K.targetId)) {
-			let { nodes: t } = fromReactFlowNodes(A), n = t.find((e) => e.id === K.targetId);
+		}), q?.type === "node" && q.targetId && O && j.find((e) => e.id === q.targetId)) {
+			let { nodes: t } = fromReactFlowNodes(j), n = t.find((e) => e.id === q.targetId);
 			if (n) {
-				let t = k(K.targetId), r = O(K.targetId, n, t);
+				let t = k(q.targetId), r = O(q.targetId, n, t);
 				r.length > 0 && r.forEach((t) => {
 					e.push({
 						label: t.label,
@@ -1842,51 +1831,53 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 		}
 		return e;
 	}, [
-		K,
-		J,
-		$,
+		q,
+		Y,
 		Le,
 		Re,
-		Z,
+		ze,
 		Q,
-		A,
+		$,
+		j,
 		O,
 		k
 	]);
-	return React.useImperativeHandle(T, () => ({
-		fitView: () => z?.fitView(),
-		getViewport: () => z?.getViewport(),
+	return React.useImperativeHandle(fe, () => ({
+		fitView: () => B?.fitView(),
+		getViewport: () => B?.getViewport(),
 		setFlow: (e) => {
-			j(toReactFlowNodes(e.nodes, e.groups)), R(toReactFlowEdges(e.edges));
+			M(toReactFlowNodes(e.nodes, e.groups)), R(toReactFlowEdges(e.edges));
 		},
-		ungroup: (e) => Q(e)
+		ungroup: (e) => $(e)
 	}), [
-		z,
-		j,
+		B,
+		M,
 		R,
-		Q
+		$
 	]), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: `canvas-flow-wrapper ${B ? "is-connecting" : ""}`,
+		className: `canvas-flow-wrapper ${me ? "is-connecting" : ""}`,
 		style: { backgroundColor: E.style?.background },
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ReactFlow, {
-				nodes: A,
-				edges: N,
+				nodes: j,
+				edges: L,
 				onNodesChange: ke,
 				onEdgesChange: Ae,
-				onConnect: U,
-				onConnectStart: W,
+				onConnect: G,
+				onConnectStart: he,
 				onConnectEnd: ge,
 				onNodeDragStop: Me,
-				isValidConnection: H,
+				isValidConnection: W,
 				onPaneClick: Ne,
 				onNodeContextMenu: Pe,
 				onPaneContextMenu: Fe,
 				onEdgeContextMenu: Ie,
-				onInit: me,
+				onInit: V,
 				nodeTypes: Oe,
 				onSelectionChange: je,
 				fitView: !0,
+				minZoom: .1,
+				maxZoom: 2.6,
 				nodesDraggable: !n,
 				nodesConnectable: !n,
 				deleteKeyCode: ["Backspace", "Delete"],
@@ -1895,29 +1886,29 @@ const CanvasEditor = React.forwardRef(({ initialFlow: t, readOnly: n = !1, onCha
 				children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Background, {}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SelectionMenu, {
-						selectedNodes: A.filter((e) => e.selected && e.type !== "group"),
-						onCreateGroup: Z
+						selectedNodes: j.filter((e) => e.selected && e.type !== "group"),
+						onCreateGroup: Q
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Controls, {}),
-					A.length === 0 && o && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					j.length === 0 && o && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "cf-empty-state-overlay",
 						children: o
 					})
 				]
 			}),
-			he.isOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FloatingNodeMenu, {
-				position: he.position,
+			H.isOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FloatingNodeMenu, {
+				position: H.position,
 				onAddNode: _e,
 				availableTypes: ve,
-				onClose: () => V((e) => ({
+				onClose: () => U((e) => ({
 					...e,
 					isOpen: !1
 				}))
 			}),
-			K?.isOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ContextMenu, {
-				items: ze,
-				position: K.position,
-				onClose: () => q(null)
+			q?.isOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ContextMenu, {
+				items: Be,
+				position: q.position,
+				onClose: () => J(null)
 			})
 		]
 	});
@@ -2446,15 +2437,15 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 	let { initialFlow: n = {
 		nodes: [],
 		edges: []
-	}, config: r = defaultCanvasConfig, components: i = defaultComponentRegistry, execution: o = {}, mode: s = "edit", ui: l = { showToolbar: !0 }, renderEmpty: f, renderNodeInspector: p, onChange: m, onSave: h, onRunFlow: g, onNodeRun: _, onGroupRun: v, onGroupSave: y, onSelectionChange: b, onNodeAdd: x, onNodeDelete: fe, onNodeMove: S, onNodeDataChange: C, onEdgeAdd: w, onEdgeDelete: T, onGroupAdd: E, onGroupDelete: D, onGroupUngroup: O, onGroupUpdate: k, getNodeContextMenuItems: A, className: j, style: M } = e, [N, P] = useState(n), [F, I] = useState(!1), [L, R] = useState(null), [pe, z] = useState(null), me = useRef(new FlowRunner(o)), B = useRef(null), he = useRef(""), V = useRef(/* @__PURE__ */ new Map()), H = useRef(new NodeMediaEmitter()), U = useCallback((e) => {
-		let t = B.current?.getFlow?.() || N;
+	}, config: r = defaultCanvasConfig, components: i = defaultComponentRegistry, execution: o = {}, mode: s = "edit", ui: l = { showToolbar: !0 }, renderEmpty: f, renderNodeInspector: p, onChange: m, onSave: h, onRunFlow: g, onNodeRun: _, onGroupRun: v, onGroupSave: y, onSelectionChange: b, onNodeAdd: x, onNodeCopy: de, onNodeDelete: S, onNodeMove: C, onNodeDataChange: w, onEdgeAdd: T, onEdgeDelete: fe, onGroupAdd: E, onGroupDelete: D, onGroupUngroup: O, onGroupUpdate: k, getNodeContextMenuItems: A, className: j, style: M } = e, [N, P] = useState(n), [F, I] = useState(!1), [pe, L] = useState(null), [R, z] = useState(null), B = useRef(new FlowRunner(o)), V = useRef(null), me = useRef(""), H = useRef(/* @__PURE__ */ new Map()), U = useRef(new NodeMediaEmitter()), W = useCallback((e) => {
+		let t = V.current?.getFlow?.() || N;
 		return !t || !t.nodes ? null : t.nodes.find((t) => t.id === e) || null;
-	}, [N]), W = useCallback((e, t, n) => {
-		let r = U(e);
+	}, [N]), G = useCallback((e, t, n) => {
+		let r = W(e);
 		if (!r) return console.warn(`[${n}] 节点不存在: ${e}`), null;
 		let i = Array.isArray(t) ? t : [t];
 		return i.includes(r.type) ? r : (console.error(`[${n}] 节点 ${e} 的类型是 "${r.type}"，不符合要求。`, `期望的类型: ${i.join(", ")}`), null);
-	}, [U]), G = useCallback((e, t) => {
+	}, [W]), K = useCallback((e, t) => {
 		let n = [
 			"src",
 			"text",
@@ -2471,45 +2462,45 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 			"_uploading",
 			"_uploadError",
 			"resourceType"
-		], r = V.current.get(e) || {}, i = { ...r };
+		], r = H.current.get(e) || {}, i = { ...r };
 		console.log(`[Core updateMediaData] 节点 ${e}:`, {
 			currentMedia: r,
 			updates: t,
 			willMerge: i
 		}), Object.keys(t).forEach((r) => {
 			n.includes(r) ? t[r] === void 0 ? delete i[r] : i[r] = t[r] : console.warn(`[updateMediaData] 忽略非媒体字段 "${r}" (节点 ${e})`, `\n允许的字段: ${n.join(", ")}`);
-		}), V.current.set(e, i), H.current.emit(e, i), console.log("[Core updateMediaData] 更新后:", i);
+		}), H.current.set(e, i), U.current.emit(e, i), console.log("[Core updateMediaData] 更新后:", i);
 	}, []);
 	useImperativeHandle(t, () => ({
 		init: (e, t) => {
 			let n = t || generateId();
-			return he.current = n, e && (P(e), B.current?.setFlow && (B.current.setFlow(e), setTimeout(() => {
-				B.current?.fitView();
+			return me.current = n, e && (P(e), V.current?.setFlow && (V.current.setFlow(e), setTimeout(() => {
+				V.current?.fitView();
 			}, 10))), n;
 		},
-		getFlow: () => B.current?.getFlow?.() || N,
+		getFlow: () => V.current?.getFlow?.() || N,
 		setFlow: (e) => {
-			P(e), B.current?.setFlow && B.current.setFlow(e);
+			P(e), V.current?.setFlow && V.current.setFlow(e);
 		},
-		runFlow: async () => ve(),
+		runFlow: async () => _e(),
 		fitView: () => {
-			B.current?.fitView();
+			V.current?.fitView();
 		},
-		getViewport: () => B.current?.getViewport() || {
+		getViewport: () => V.current?.getViewport() || {
 			x: 0,
 			y: 0,
 			zoom: 1
 		},
 		getNode: (e) => {
-			let t = B.current?.getFlow?.() || N;
+			let t = V.current?.getFlow?.() || N;
 			return !t || !t.nodes ? null : t.nodes.find((t) => t.id === e) || null;
 		},
 		getUpstreamNodes: (e) => {
-			let t = B.current?.getFlow?.();
+			let t = V.current?.getFlow?.();
 			if (!t) return [];
 			let n = t.edges.filter((t) => t.target === e).map((e) => e.source);
 			return t.nodes.filter((e) => n.includes(e.id)).map((e) => {
-				let t = r.nodeDefinitions.find((t) => t.type === e.type), n = V.current.get(e.id) || {};
+				let t = r.nodeDefinitions.find((t) => t.type === e.type), n = H.current.get(e.id) || {};
 				return {
 					id: e.id,
 					type: e.type,
@@ -2520,51 +2511,51 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 			});
 		},
 		setNodeImage: (e, t) => {
-			W(e, [
+			G(e, [
 				"image",
 				"video",
 				"audio",
 				"user-upload"
-			], "setNodeImage") && G(e, { src: t });
+			], "setNodeImage") && K(e, { src: t });
 		},
 		setNodeVideo: (e, t) => {
-			W(e, "video", "setNodeVideo") && G(e, { src: t });
+			G(e, "video", "setNodeVideo") && K(e, { src: t });
 		},
 		setNodeAudio: (e, t) => {
-			W(e, "audio", "setNodeAudio") && G(e, { src: t });
+			G(e, "audio", "setNodeAudio") && K(e, { src: t });
 		},
 		setNodeText: (e, t) => {
-			W(e, "text", "setNodeText") && G(e, { text: t });
+			G(e, "text", "setNodeText") && K(e, { text: t });
 		},
 		setNodeTitle: (e, t) => {
-			U(e) ? G(e, { title: t }) : console.warn(`[setNodeTitle] 节点不存在: ${e}`);
+			W(e) ? K(e, { title: t }) : console.warn(`[setNodeTitle] 节点不存在: ${e}`);
 		},
 		setNodeOutput: (e, t) => {
-			U(e) ? G(e, { outputData: t }) : console.warn(`[setNodeOutput] 节点不存在: ${e}`);
+			W(e) ? K(e, { outputData: t }) : console.warn(`[setNodeOutput] 节点不存在: ${e}`);
 		},
 		setUploadNodeSrc: (e, t, n) => {
-			if (!W(e, "user-upload", "setUploadNodeSrc")) return;
+			if (!G(e, "user-upload", "setUploadNodeSrc")) return;
 			let r = {
 				src: t,
 				_uploading: !1,
 				_uploadError: null
 			};
-			n && (n.fileName && (r.fileName = n.fileName), n.fileType && (r.fileType = n.fileType), n.fileSize && (r.fileSize = n.fileSize)), G(e, r), console.log(`[setUploadNodeSrc] 设置上传节点 ${e} 的媒体源:`, t);
+			n && (n.fileName && (r.fileName = n.fileName), n.fileType && (r.fileType = n.fileType), n.fileSize && (r.fileSize = n.fileSize)), K(e, r), console.log(`[setUploadNodeSrc] 设置上传节点 ${e} 的媒体源:`, t);
 		},
 		setUploadNodeLoading: (e, t) => {
-			W(e, "user-upload", "setUploadNodeLoading") && (G(e, {
+			G(e, "user-upload", "setUploadNodeLoading") && (K(e, {
 				_uploading: t,
 				_uploadError: t ? null : void 0
 			}), console.log(`[setUploadNodeLoading] 设置上传节点 ${e} 加载状态:`, t));
 		},
 		setUploadNodeError: (e, t) => {
-			W(e, "user-upload", "setUploadNodeError") && (G(e, {
+			G(e, "user-upload", "setUploadNodeError") && (K(e, {
 				_uploadError: t,
 				_uploading: !1
 			}), console.log(`[setUploadNodeError] 设置上传节点 ${e} 错误:`, t));
 		},
 		clearUploadNode: (e) => {
-			W(e, "user-upload", "clearUploadNode") && (G(e, {
+			G(e, "user-upload", "clearUploadNode") && (K(e, {
 				src: void 0,
 				fileName: void 0,
 				fileType: void 0,
@@ -2575,88 +2566,88 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 			}), console.log(`[clearUploadNode] 清空上传节点 ${e}`));
 		},
 		setNodeContent: (e, t) => {
-			G(e, t);
+			K(e, t);
 		},
 		clearNodeContent: (e) => {
-			let { src: t, text: n, outputData: r, ...i } = V.current.get(e) || {};
-			V.current.set(e, i), H.current.emit(e, i);
+			let { src: t, text: n, outputData: r, ...i } = H.current.get(e) || {};
+			H.current.set(e, i), U.current.emit(e, i);
 		},
 		setNodeLoading: (e) => {
-			let t = V.current.get(e) || {};
-			V.current.set(e, {
+			let t = H.current.get(e) || {};
+			H.current.set(e, {
 				...t,
 				_loading: !0
-			}), H.current.emit(e, V.current.get(e));
+			}), U.current.emit(e, H.current.get(e));
 		},
 		clearNodeLoading: (e) => {
-			let t = V.current.get(e) || {};
+			let t = H.current.get(e) || {};
 			console.log(`[Core clearNodeLoading] 节点 ${e} 清除前:`, t);
 			let n = { ...t };
-			delete n._loading, V.current.set(e, n), H.current.emit(e, n), console.log(`[Core clearNodeLoading] 节点 ${e} 清除后:`, n);
+			delete n._loading, H.current.set(e, n), U.current.emit(e, n), console.log(`[Core clearNodeLoading] 节点 ${e} 清除后:`, n);
 		},
 		setNodeError: (e, t) => {
-			let n = V.current.get(e) || {};
-			V.current.set(e, {
+			let n = H.current.get(e) || {};
+			H.current.set(e, {
 				...n,
 				_error: t
-			}), H.current.emit(e, V.current.get(e));
+			}), U.current.emit(e, H.current.get(e));
 		},
 		clearNodeError: (e) => {
-			let t = { ...V.current.get(e) || {} };
-			delete t._error, V.current.set(e, t), H.current.emit(e, t);
+			let t = { ...H.current.get(e) || {} };
+			delete t._error, H.current.set(e, t), U.current.emit(e, t);
 		},
 		updateNodeMedia: (e, t) => {
 			let n = {
-				...V.current.get(e) || {},
+				...H.current.get(e) || {},
 				...t
 			};
 			Object.keys(n).forEach((e) => {
 				n[e] === void 0 && delete n[e];
-			}), V.current.set(e, n), H.current.emit(e, n);
+			}), H.current.set(e, n), U.current.emit(e, n);
 		},
 		batchUpdateNodeMedia: (e) => {
 			e.forEach(({ nodeId: e, data: t }) => {
 				let n = {
-					...V.current.get(e) || {},
+					...H.current.get(e) || {},
 					...t
 				};
-				V.current.set(e, n);
-			}), H.current.batchEmit(e.map((e) => ({
+				H.current.set(e, n);
+			}), U.current.batchEmit(e.map((e) => ({
 				nodeId: e.nodeId,
-				data: V.current.get(e.nodeId)
+				data: H.current.get(e.nodeId)
 			})));
 		},
-		getNodeMedia: (e) => V.current.get(e) || {},
+		getNodeMedia: (e) => H.current.get(e) || {},
 		updateNodeStatus: (e, t) => {
 			let n = {
-				...V.current.get(e) || {},
+				...H.current.get(e) || {},
 				_executionStatus: t
 			};
-			V.current.set(e, n), H.current.emit(e, n);
+			H.current.set(e, n), U.current.emit(e, n);
 		}
 	}), [
 		N,
 		r,
-		U,
 		W,
-		G
+		G,
+		K
 	]);
-	let ge = useCallback((e) => {
+	let he = useCallback((e) => {
 		P(e), m?.(e);
-	}, [m]), _e = useCallback((e) => {
+	}, [m]), ge = useCallback((e) => {
 		e.length === 1 ? z(e[0]) : z(null), b?.(e);
-	}, [b]), ve = async () => {
+	}, [b]), _e = async () => {
 		if (!F) {
 			I(!0), g?.(N);
 			try {
-				return await me.current.runFlow(N, (e, t) => {});
+				return await B.current.runFlow(N, (e, t) => {});
 			} catch (e) {
 				console.error("Flow execution failed", e);
 			} finally {
 				I(!1);
 			}
 		}
-	}, K = async (e) => {
+	}, ve = async (e) => {
 		if (F) return;
 		if (v) {
 			I(!0);
@@ -2679,21 +2670,21 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 		};
 		I(!0);
 		try {
-			await me.current.runFlow(r, (e, t) => {});
+			await B.current.runFlow(r, (e, t) => {});
 		} catch (t) {
 			console.error(`Group ${e} execution failed`, t);
 		} finally {
 			I(!1);
 		}
 	}, ye = async (e) => {
-		if (!L) {
-			R(e);
+		if (!pe) {
+			L(e);
 			try {
 				_ ? await _(e) : console.warn("No onNodeRun handler provided");
 			} catch (e) {
 				console.error("Node execution failed:", e);
 			} finally {
-				R(null);
+				L(null);
 			}
 		}
 	}, be = useCallback((e, t) => {
@@ -2709,10 +2700,10 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 				k?.(t);
 				break;
 			case "ungroup":
-				B.current?.ungroup && B.current.ungroup(t.id);
+				V.current?.ungroup && V.current.ungroup(t.id);
 				break;
 			case "run":
-				K(t.id);
+				ve(t.id);
 				break;
 			case "save":
 				let e = N.groups?.find((e) => e.id === t.id);
@@ -2736,8 +2727,8 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 		N,
 		v,
 		y
-	]), xe = useCallback((e) => V.current.get(e) || {}, []), Se = useCallback((e, t) => {
-		let n = V.current.get(e) || {};
+	]), xe = useCallback((e) => H.current.get(e) || {}, []), Se = useCallback((e, t) => {
+		let n = H.current.get(e) || {};
 		console.log(`[Core updateNodeMedia] 节点 ${e}:`, {
 			currentMedia: n,
 			newMedia: t,
@@ -2752,20 +2743,20 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 		};
 		Object.keys(r).forEach((e) => {
 			r[e] === void 0 && delete r[e];
-		}), V.current.set(e, r), H.current.emit(e, r), console.log("[Core updateNodeMedia] 更新后的 mediaMap:", r);
+		}), H.current.set(e, r), U.current.emit(e, r), console.log("[Core updateNodeMedia] 更新后的 mediaMap:", r);
 	}, []);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CanvasProvider, {
 		config: r,
 		components: i,
 		readOnly: s === "view",
 		onNodeRun: ye,
-		onNodeDataChange: C,
-		runningNodeId: L,
-		isExecuting: F || !!L,
+		onNodeDataChange: w,
+		runningNodeId: pe,
+		isExecuting: F || !!pe,
 		onGroupAction: be,
-		inspectingNodeId: pe,
-		mediaMap: V.current,
-		mediaEmitter: H.current,
+		inspectingNodeId: R,
+		mediaMap: H.current,
+		mediaEmitter: U.current,
 		getNodeMedia: xe,
 		updateNodeMedia: Se,
 		renderNodeInspector: p,
@@ -2780,18 +2771,19 @@ const NodeEmptyState = ({ title: e = "尝试：", items: t, onAction: n }) => {
 				...M
 			},
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CanvasEditor, {
-				ref: B,
+				ref: V,
 				initialFlow: n,
 				readOnly: s === "view",
 				renderEmpty: f,
-				onChange: ge,
-				onSelectionChange: _e,
+				onChange: he,
+				onSelectionChange: ge,
 				onNodeAdd: x,
-				onNodeMove: S,
-				onNodeDelete: fe,
-				onNodeDataChange: C,
-				onEdgeAdd: w,
-				onEdgeDelete: T,
+				onNodeCopy: de,
+				onNodeMove: C,
+				onNodeDelete: S,
+				onNodeDataChange: w,
+				onEdgeAdd: T,
+				onEdgeDelete: fe,
 				onGroupAdd: E,
 				onGroupDelete: D,
 				onGroupUngroup: O,
