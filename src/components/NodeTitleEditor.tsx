@@ -33,6 +33,7 @@ export const NodeTitleEditor: React.FC<NodeTitleEditorProps> = ({
       <input
         className={`nodrag canvas-node-title-input ${className}`}
         autoFocus
+        maxLength={25}
         onBlur={() => setIsEditing(false)}
         placeholder="输入标题..."
         value={title || ''}

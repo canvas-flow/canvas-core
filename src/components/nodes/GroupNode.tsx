@@ -123,8 +123,13 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps) => {
         {isEditing ? (
           <input
             autoFocus
+            maxLength={25}
             value={labelInput}
-            onChange={(e) => setLabelInput(e.target.value)}
+            onChange={(e) => {
+              // 限制最大15字符
+              const newValue = e.target.value.slice(0, 15);
+              setLabelInput(newValue);
+            }}
             onBlur={handleRename}
             onKeyDown={(e) => e.key === 'Enter' && handleRename()}
             onMouseDown={(e) => e.stopPropagation()}

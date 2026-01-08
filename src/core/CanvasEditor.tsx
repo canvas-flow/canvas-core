@@ -651,7 +651,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         onSelectionChange={onSelectionChangeInternal}
         fitView
         minZoom={0.1}
-        maxZoom={2.6}
+        maxZoom={2.5}
         nodesDraggable={!readOnly}
         nodesConnectable={!readOnly}
         deleteKeyCode={['Backspace', 'Delete']}
