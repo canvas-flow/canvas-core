@@ -1,5 +1,5 @@
 import React, { useState, useRef, useImperativeHandle, useCallback, useMemo } from 'react';
-import { CanvasEditor } from './CanvasEditor';
+import { CanvasEditor, CanvasDropEvent } from './CanvasEditor';
 import { FlowRunner } from './FlowRunner';
 import { CanvasProvider, GroupActionType } from './CanvasContext';
 import { CanvasFlowValue, CanvasFlowNode, CanvasFlowEdge, CanvasFlowGroup } from '../types/flow';
@@ -83,6 +83,9 @@ export interface CanvasFlowProps {
   onGroupDelete?: (groupId: string) => void;
   onGroupUngroup?: (groupId: string, nodeIds: string[]) => void; // 解组：移除分组但保留节点
   onGroupUpdate?: (group: Partial<CanvasFlowGroup> & { id: string }) => void;
+
+  /** 拖拽放置到画布事件 */
+  onCanvasDrop?: (event: CanvasDropEvent) => void;
 
   className?: string;
   style?: React.CSSProperties;
@@ -173,6 +176,9 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
     
     // Custom context menu
     getNodeContextMenuItems,
+    
+    // Canvas drop
+    onCanvasDrop,
     
     className,
     style
@@ -793,6 +799,8 @@ export const CanvasFlow = React.forwardRef<CanvasFlowHandle, CanvasFlowProps>((p
           onGroupDelete={onGroupDelete}
           onGroupUngroup={onGroupUngroup}
           onGroupUpdate={onGroupUpdate}
+          
+          onCanvasDrop={onCanvasDrop}
         />
       </div>
     </CanvasProvider>

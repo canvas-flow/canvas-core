@@ -23,6 +23,16 @@ import { GroupNode } from '../components/nodes/GroupNode';
 import { SelectionMenu } from '../components/SelectionMenu';
 import { useCanvasConnection } from './hooks/useCanvasConnection';
 
+/** 拖拽事件数据 */
+export interface CanvasDropEvent {
+  /** 拖拽数据（JSON 解析后） */
+  data: any;
+  /** 画布坐标位置 */
+  position: { x: number; y: number };
+  /** 原始 dataTransfer */
+  dataTransfer: DataTransfer;
+}
+
 interface CanvasEditorProps {
   initialFlow?: CanvasFlowValue;
   readOnly?: boolean;
@@ -43,6 +53,9 @@ interface CanvasEditorProps {
   onGroupDelete?: (groupId: string) => void;
   onGroupUngroup?: (groupId: string, nodeIds: string[]) => void;
   onGroupUpdate?: (group: Partial<CanvasFlowGroup> & { id: string }) => void;
+
+  /** 拖拽放置事件回调 */
+  onCanvasDrop?: (event: CanvasDropEvent) => void;
 }
 
 export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
@@ -62,6 +75,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
   onGroupDelete,
   onGroupUngroup,
   onGroupUpdate,
+  onCanvasDrop,
 }, _ref) => {
   const { config, onNodeDataChange, getNodeContextMenuItems, getNodeMedia, updateNodeMedia } = useCanvasContext();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -205,6 +219,42 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
       }
     }
   }, [onNodeMove, onGroupUpdate, nodes]);
+
+  // 拖拽处理
+  const handleDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  }, []);
+
+  const handleDrop = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    
+    if (!onCanvasDrop || !rfInstance) return;
+
+    // 尝试获取 JSON 数据
+    const jsonData = event.dataTransfer.getData('application/json');
+    let data: any = null;
+    
+    if (jsonData) {
+      try {
+        data = JSON.parse(jsonData);
+      } catch (e) {
+        console.warn('[CanvasEditor] 无法解析拖拽数据:', e);
+      }
+    }
+
+    // 转换为画布坐标
+    const position = rfInstance.screenToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    onCanvasDrop({
+      data,
+      position,
+      dataTransfer: event.dataTransfer,
+    });
+  }, [onCanvasDrop, rfInstance]);
 
   const onPaneClick = useCallback((event: React.MouseEvent) => {
     if (event.detail === 2 && !readOnly) {
@@ -646,6 +696,8 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         onNodeContextMenu={onNodeContextMenu}
         onPaneContextMenu={onPaneContextMenu}
         onEdgeContextMenu={onEdgeContextMenu}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
         onInit={setRfInstance}
         nodeTypes={reactFlowNodeTypes}
         onSelectionChange={onSelectionChangeInternal}

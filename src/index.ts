@@ -1,6 +1,7 @@
 
 export { CanvasFlow } from './core/CanvasFlow';
 export type { CanvasFlowProps, CanvasFlowHandle, CanvasMode, CanvasFlowUIOptions, CustomContextMenuItem } from './core/CanvasFlow';
+export type { CanvasDropEvent } from './core/CanvasEditor';
 
 export * from './types/flow';
 export * from './types/execution';
