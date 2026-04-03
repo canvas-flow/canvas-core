@@ -9,6 +9,7 @@ interface UseCanvasConnectionProps {
   edges: Edge[];
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
   setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
+  setSelectedNodeId: (id: string | null) => void;
   onEdgeAdd?: (edge: CanvasFlowEdge) => void;
   onNodeAdd?: (node: any) => void;
   config: CanvasConfig;
@@ -20,6 +21,7 @@ export function useCanvasConnection({
   edges,
   setEdges,
   setNodes,
+  setSelectedNodeId,
   onEdgeAdd,
   onNodeAdd,
   config,
@@ -164,6 +166,7 @@ export function useCanvasConnection({
         position: flowPos,
         width: defaultWidth,
         height: defaultHeight,
+        selected: true,
         style: { 
             width: `${defaultWidth}px`, 
             height: `${defaultHeight}px` 
@@ -171,7 +174,8 @@ export function useCanvasConnection({
         data: {}, // Empty data object for ReactFlow
     };
 
-    setNodes((nds) => nds.concat(newNode));
+    setNodes((nds) => nds.map(n => ({ ...n, selected: false })).concat(newNode));
+    setSelectedNodeId(newNodeId);
     
     if (onNodeAdd) {
         const { nodes: newNodes } = fromReactFlowNodes([newNode], []);

@@ -1,50 +1,31 @@
 
 import React, { useState } from 'react';
-import { PenLine, Video, Image as ImageIcon, Music } from 'lucide-react';
 import { NodeContentProps } from '../../types/schema';
-import { NodeEmptyState, MenuAction } from './NodeEmptyState';
 import '../../styles/canvas.css';
 
-export const TextNode: React.FC<NodeContentProps> = ({ data, isConnected, onChange }) => {
+export const TextNode: React.FC<NodeContentProps> = ({ data, onChange }) => {
   const [isEditing, setIsEditing] = useState(false);
-  
-  // ✅ 显示编辑器的条件：有连接关系 OR 已交互过 OR 已有文本内容
-  const showEditor = isConnected || data.isInteracted || !!data.text;
+  const isNegativePrompt = !!data.isNegativePrompt;
 
-  const menuItems: MenuAction[] = [
-    { id: 'edit', icon: PenLine, label: '自己编写内容' },
-    { id: 'text-to-video', icon: Video, label: '文生视频' },
-    { id: 'image-to-prompt', icon: ImageIcon, label: '图片反推提示词' },
-    { id: 'text-to-audio', icon: Music, label: '文生音乐' },
-  ];
-
-  if (!showEditor) {
-    return (
-      <NodeEmptyState 
-        items={menuItems}
-        onAction={(action) => {
-          if (action === 'edit') {
-            onChange({ isInteracted: true });
-            setIsEditing(true);
-          } else {
-            console.log('Action triggered:', action);
-          }
-        }} 
-      />
-    );
-  }
-  
   return (
     <div 
-      className="cf-text-node-container"
+      className={`cf-text-node-container${isNegativePrompt ? ' cf-text-node-negative' : ''}`}
       onDoubleClick={() => setIsEditing(true)}
     >
+      {isNegativePrompt && (
+        <div
+          className="cf-text-node-negative-badge"
+          title="反向提示词：描述不希望出现的内容。若模型不支持反向提示词，此内容将被忽略。"
+        >
+          反向提示词
+        </div>
+      )}
       {isEditing ? (
         <textarea
           className="nodrag cf-text-node-input"
           autoFocus
           onBlur={() => setIsEditing(false)}
-          placeholder="输入文本或者编辑生成结果..."
+          placeholder={isNegativePrompt ? '描述不希望出现的内容,若模型不支持反向提示词，此内容将被忽略...' : '输入文本或者编辑生成结果...'}
           value={data.text || ''}
           onChange={(e) => onChange({ text: e.target.value })}
           onKeyDown={(e) => e.stopPropagation()} 
@@ -52,7 +33,7 @@ export const TextNode: React.FC<NodeContentProps> = ({ data, isConnected, onChan
       ) : (
         <>
           <div className={`cf-text-node-display ${!data.text ? 'placeholder' : ''}`}>
-            {data.text || '双击输入文本...'}
+            {data.text || (isNegativePrompt ? '双击输入反向提示词,若模型不支持反向提示词，此内容将被忽略...' : '双击输入文本...')}
           </div>
           <div className="cf-text-node-overlay">
             双击编辑

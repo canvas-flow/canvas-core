@@ -82,6 +82,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   
   const [rfInstance, setRfInstance] = useState<any>(null);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   const {
     isConnecting,
@@ -98,6 +99,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
     edges,
     setEdges,
     setNodes,
+    setSelectedNodeId,
     onEdgeAdd,
     onNodeAdd,
     config,
@@ -113,7 +115,6 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
 
   const [clipboard, setClipboard] = useState<Node | null>(null);
   const [mousePosition, setMousePosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   
   // Init Data
   useEffect(() => {
@@ -701,7 +702,6 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         onInit={setRfInstance}
         nodeTypes={reactFlowNodeTypes}
         onSelectionChange={onSelectionChangeInternal}
-        fitView
         minZoom={0.1}
         maxZoom={2.5}
         nodesDraggable={!readOnly}
@@ -709,6 +709,7 @@ export const CanvasEditor = React.forwardRef<any, CanvasEditorProps>(({
         deleteKeyCode={['Backspace', 'Delete']}
         selectionKeyCode={['Shift']}
         noPanClassName="nopan"
+        zoomOnDoubleClick={false}
       >
         <Background />
         <SelectionMenu 

@@ -1,8 +1,7 @@
 
 import React, { useRef, useState } from 'react';
-import { Video, Image as ImageIcon, Layers, Sparkles, Music } from 'lucide-react';
+import { Video, Image as ImageIcon, Music } from 'lucide-react';
 import { NodeContentProps } from '../../types/schema';
-import { NodeEmptyState, MenuAction } from './NodeEmptyState';
 import { MediaViewerModal } from '../MediaViewerModal';
 import '../../styles/canvas.css';
 
@@ -12,17 +11,7 @@ export const ImageNode: React.FC<NodeContentProps> = ({ data, isConnected, onCha
   const imgRef = useRef<HTMLImageElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const menuItems: MenuAction[] = [
-    { id: 'img-to-img', icon: ImageIcon, label: '图生图' },
-    { id: 'img-to-video', icon: ImageIcon, label: '图生视频' },
-    { id: 'remove-bg', icon: Layers, label: '图片换背景' },
-    { id: 'first-frame-video', icon: Video, label: '首帧图生视频' },
-  ];
-
   const mediaSrc = data.src || data.output;
-  // showContent needs to verify that mediaSrc is actually present if it's relying on data
-  // isConnected implies there's an upstream connection, but doesn't mean we have data yet.
-  // However, if we have mediaSrc, we should definitely show it.
   const showContent = Boolean(mediaSrc || isConnected);
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -40,10 +29,9 @@ export const ImageNode: React.FC<NodeContentProps> = ({ data, isConnected, onCha
 
   if (!showContent) {
     return (
-      <NodeEmptyState 
-        items={menuItems}
-        onAction={(action) => console.log('Image action:', action)} 
-      />
+      <div className="cf-media-placeholder">
+        <ImageIcon size={32} strokeWidth={1} />
+      </div>
     );
   }
 
@@ -81,11 +69,6 @@ export const VideoNode: React.FC<NodeContentProps> = ({ data, isConnected, onCha
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const menuItems: MenuAction[] = [
-    { id: 'first-last-frame-to-video', icon: Layers, label: '首尾帧生成视频' },
-    { id: 'first-frame-to-video', icon: Sparkles, label: '首帧生成视频' },
-  ];
-
   const showContent = isConnected || data.output || data.src;
   const mediaSrc = data.src || data.output;
 
@@ -103,10 +86,9 @@ export const VideoNode: React.FC<NodeContentProps> = ({ data, isConnected, onCha
 
   if (!showContent) {
     return (
-      <NodeEmptyState 
-        items={menuItems}
-        onAction={(action) => console.log('Video action:', action)} 
-      />
+      <div className="cf-media-placeholder">
+        <Video size={32} strokeWidth={1} />
+      </div>
     );
   }
 
@@ -148,19 +130,14 @@ export const VideoNode: React.FC<NodeContentProps> = ({ data, isConnected, onCha
 export const AudioNode: React.FC<NodeContentProps> = ({ data, isConnected }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const menuItems: MenuAction[] = [
-    { id: 'audio-to-video', icon: Music, label: '音频生视频' },
-  ];
-
   const showContent = isConnected || data.output || data.src;
   const mediaSrc = data.src || data.output;
 
   if (!showContent) {
     return (
-      <NodeEmptyState 
-        items={menuItems}
-        onAction={(action) => console.log('Audio action:', action)} 
-      />
+      <div className="cf-media-placeholder">
+        <Music size={32} strokeWidth={1} />
+      </div>
     );
   }
 
