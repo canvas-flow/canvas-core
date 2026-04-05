@@ -1060,6 +1060,8 @@ video::-webkit-media-controls-enclosure {
   object-fit: cover;
   background: #333;
   flex-shrink: 0;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .inspector-ref-text {
