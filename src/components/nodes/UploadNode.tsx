@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, X, Image as ImageIcon, Video as VideoIcon } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, Video as VideoIcon, Music } from 'lucide-react';
 import { NodeContentProps } from '../../types/schema';
 import '../../styles/canvas.css';
 
@@ -9,7 +9,7 @@ import '../../styles/canvas.css';
  * 职责：
  * 1. 渲染上传 UI（上传按钮、预览、加载状态、错误提示）
  * 2. 触发上传事件（通过 onChange 回调通知 Demo 层）
- * 3. 文件类型前端校验（只允许图片和视频）
+ * 3. 文件类型前端校验（允许图片、视频、音频）
  * 
  * 不负责：
  * 1. 实际的文件上传（由 Demo 层的 api.uploadFile 处理）
@@ -22,8 +22,8 @@ export const UploadNode: React.FC<NodeContentProps> = ({ data, onChange }) => {
   const isUploading = data._uploading || false;
   const uploadError = data._uploadError;
 
-  // ✅ 支持的文件类型：只允许图片和视频
-  const acceptTypes = 'image/*,video/*';
+  // ✅ 支持的文件类型：图片、视频、音频
+  const acceptTypes = 'image/*,video/*,audio/*';
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -32,10 +32,11 @@ export const UploadNode: React.FC<NodeContentProps> = ({ data, onChange }) => {
     // ✅ 验证文件类型
     const isImage = file.type.startsWith('image/');
     const isVideo = file.type.startsWith('video/');
+    const isAudio = file.type.startsWith('audio/');
     
-    if (!isImage && !isVideo) {
+    if (!isImage && !isVideo && !isAudio) {
       onChange({ 
-        _uploadError: '只支持图片和视频文件' 
+        _uploadError: '只支持图片、视频和音频文件' 
       });
       return;
     }
@@ -68,10 +69,11 @@ export const UploadNode: React.FC<NodeContentProps> = ({ data, onChange }) => {
     const fileType = data.fileType || '';
     
     // ✅ 通过 URL 扩展名判断媒体类型（作为 fallback）
-    const getMediaTypeFromUrl = (url: string): 'image' | 'video' | 'unknown' => {
+    const getMediaTypeFromUrl = (url: string): 'image' | 'video' | 'audio' | 'unknown' => {
       const ext = url.split('?')[0].split('.').pop()?.toLowerCase();
       if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '')) return 'image';
       if (['mp4', 'webm', 'mov', 'avi', 'mkv', 'm4v'].includes(ext || '')) return 'video';
+      if (['mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a'].includes(ext || '')) return 'audio';
       return 'unknown';
     };
     
@@ -80,6 +82,7 @@ export const UploadNode: React.FC<NodeContentProps> = ({ data, onChange }) => {
     // ✅ 优先使用 fileType，fallback 到 URL 扩展名判断
     const isVideo = fileType.startsWith('video/') || urlMediaType === 'video';
     const isImage = fileType.startsWith('image/') || urlMediaType === 'image';
+    const isAudio = fileType.startsWith('audio/') || urlMediaType === 'audio';
     
     // ✅ 视频优先判断（避免视频被误渲染为图片）
     if (isVideo) {
@@ -102,6 +105,18 @@ export const UploadNode: React.FC<NodeContentProps> = ({ data, onChange }) => {
             console.error('Image load failed:', mediaUrl);
           }}
         />
+      );
+    }
+
+    if (isAudio) {
+      return (
+        <div className="cf-upload-preview-audio">
+          <Music size={28} strokeWidth={1.5} style={{ marginBottom: 6, color: '#888' }} />
+          <span style={{ fontSize: 11, color: '#555', textAlign: 'center', wordBreak: 'break-all', padding: '0 4px' }}>
+            {data.fileName || '音频文件'}
+          </span>
+          <audio src={mediaUrl} controls style={{ width: '100%', marginTop: 6 }} />
+        </div>
       );
     }
 
@@ -164,11 +179,12 @@ export const UploadNode: React.FC<NodeContentProps> = ({ data, onChange }) => {
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
             <ImageIcon size={20} strokeWidth={1.5} />
             <VideoIcon size={20} strokeWidth={1.5} />
+            <Music size={20} strokeWidth={1.5} />
           </div>
           <Upload size={24} />
-          <span className="cf-upload-label-text">点击上传图片或视频</span>
+          <span className="cf-upload-label-text">点击上传图片、视频或音频</span>
           <span className="cf-upload-subtext" style={{ fontSize: 10, color: '#666', marginTop: 4 }}>
-            支持 JPG、PNG、MP4 等格式
+            支持 JPG、PNG、MP4、MP3 等格式
           </span>
         </label>
       )}
